@@ -36,15 +36,25 @@ class ProductActionController extends Controller
     public function importProducts(Request $request)
     {
         $request->validate(['file' => 'required|mimes:xlsx,xls,csv']);
-        Excel::import(new ProductImport, $request->file('file'));
-        return back()->with('success', 'Products imported successfully.');
+        
+        try {
+            Excel::import(new ProductImport, $request->file('file'));
+            return back()->with('success', 'Products imported. Duplicates were automatically skipped.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Import failed: ' . $e->getMessage());
+        }
     }
 
     public function importStock(Request $request)
     {
         $request->validate(['file' => 'required|mimes:xlsx,xls,csv']);
-        Excel::import(new StockImport, $request->file('file'));
-        return back()->with('success', 'Stock levels updated successfully.');
+        
+        try {
+            Excel::import(new StockImport, $request->file('file'));
+            return back()->with('success', 'Stock levels updated successfully.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Stock sync failed: ' . $e->getMessage());
+        }
     }
 
     // --- Barcode PDf ---

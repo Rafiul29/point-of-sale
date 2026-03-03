@@ -25,7 +25,7 @@ class ProductExport implements FromCollection, WithHeadings, WithMapping
             'Purchase Price',
             'Selling Price',
             'Stock Quantity',
-            'Reorder Level',
+            'Low Stock Level',
         ];
     }
 

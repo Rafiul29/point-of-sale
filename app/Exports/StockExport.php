@@ -15,6 +15,6 @@ class StockExport implements FromCollection, WithHeadings
 
     public function headings(): array
     {
-        return ['ID', 'Product Name', 'Barcode', 'Current Stock', 'Reorder Level'];
+        return ['ID', 'Product Name', 'Barcode', 'Current Stock', 'Low Stock Level'];
     }
 }
