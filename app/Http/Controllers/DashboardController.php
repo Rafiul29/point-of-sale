@@ -13,6 +13,10 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        if (auth()->user()->isCashier()) {
+            return redirect()->route('cashier.dashboard');
+        }
+
         $today = Carbon::today();
         $thisMonth = Carbon::now()->startOfMonth();
 

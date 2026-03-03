@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Antigravity POS</title>
+    <title>Login | POS</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Font Awesome -->
@@ -86,7 +86,7 @@
             <div class="absolute inset-0 flex flex-col justify-end p-20 text-white">
                 <div class="max-w-xl">
                     <h1 class="text-6xl font-extrabold tracking-tight leading-tight">Lightning fast <br><span class="text-indigo-400">Digital Retail</span></h1>
-                    <p class="mt-6 text-xl font-medium text-slate-300">Experience the future of point-of-sale management with Antigravity's real-time inventory and lightning terminal.</p>
+                    <p class="mt-6 text-xl font-medium text-slate-300">Experience the future of point-of-sale management with real-time inventory and lightning terminal.</p>
                 </div>
             </div>
         </div>

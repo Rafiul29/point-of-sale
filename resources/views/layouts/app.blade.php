@@ -6,13 +6,13 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     
     <!-- Dynamic SEO -->
-    <title>{{ $settings['shop_name'] ?? config('app.name', 'Antigravity POS') }}</title>
+    <title>{{ $settings['shop_name'] ?? config('app.name', 'POS') }}</title>
     <meta name="description" content="{{ $settings['meta_description'] ?? 'Modern Point of Sale solution for retail and restaurants.' }}">
     <meta name="keywords" content="{{ $settings['meta_keywords'] ?? 'pos, retail, inventory' }}">
     <link rel="icon" type="image/x-icon" href="{{ isset($settings['site_favicon']) ? asset('storage/' . $settings['site_favicon']) : asset('favicon.ico') }}">
 
     <!-- OpenGraph -->
-    <meta property="og:title" content="{{ $settings['meta_title'] ?? config('app.name', 'Antigravity POS') }}">
+    <meta property="og:title" content="{{ $settings['meta_title'] ?? config('app.name', 'POS') }}">
     <meta property="og:description" content="{{ $settings['meta_description'] ?? 'Modern Point of Sale solution for retail and restaurants.' }}">
     <meta property="og:image" content="{{ isset($settings['og_image']) ? asset('storage/' . $settings['og_image']) : '' }}">
 
