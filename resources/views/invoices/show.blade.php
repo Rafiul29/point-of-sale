@@ -25,7 +25,7 @@
                     <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-600 shadow-xl shadow-indigo-600/30 mb-6 print:hidden">
                         <i class="fas fa-bolt text-white text-xl"></i>
                     </div>
-                    <h1 class="text-3xl font-black tracking-tight print:text-2xl">{{ $settings['shop_name'] ?? 'Antigravity POS' }}</h1>
+                    <h1 class="text-3xl font-black tracking-tight print:text-2xl">{{ $settings['shop_name'] ?? 'POS' }}</h1>
                     <p class="mt-2 text-sm font-medium text-slate-400 max-w-[250px] leading-relaxed print:text-slate-600 print:text-xs">
                         {{ $settings['shop_address'] ?? 'Silicon Valley, CA' }}<br>
                         {{ $settings['shop_phone'] ?? '+1 555 000 000' }}
@@ -104,7 +104,7 @@
         <div class="p-12 bg-slate-50/50 print:p-8 print:bg-white print:border-t-2 print:border-slate-200">
             <div class="flex flex-col md:flex-row justify-between items-start gap-8">
                 <div class="flex-1 italic text-slate-400 text-xs leading-relaxed print:text-slate-600 print:text-[10px]">
-                    <p>Thank you for choosing {{ $settings['shop_name'] ?? 'Antigravity POS' }}. All digital transactions are verified per standard compliance protocols. Please retain this receipt for warranty claims.</p>
+                    <p>Thank you for choosing {{ $settings['shop_name'] ?? 'POS' }}. All digital transactions are verified per standard compliance protocols. Please retain this receipt for warranty claims.</p>
                 </div>
                 <div class="w-full md:w-64 space-y-4 print:w-48 print:space-y-2">
                     <div class="flex justify-between items-center text-sm font-bold text-slate-500 print:text-xs">
