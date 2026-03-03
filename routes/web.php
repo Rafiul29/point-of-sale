@@ -16,6 +16,17 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UserController;
 
+// Landing Page
+Route::get('/', function () {
+    if (auth()->check()) {
+        $role = auth()->user()->role ?? 'Cashier';
+        return $role === 'Admin'
+            ? redirect()->route('dashboard')
+            : redirect()->route('cashier.dashboard');
+    }
+    return view('landing');
+})->name('landing');
+
 // Auth Routes
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -47,7 +58,7 @@ Route::middleware('auth')->group(function () {
 
     // ── Admin-only Routes (Management Layer) ─────────────────────────────────────────
     Route::middleware('role:Admin')->group(function () {
-        Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         // Products & Actions
         Route::get('/products/export', [\App\Http\Controllers\ProductActionController::class, 'exportProducts'])->name('products.export');
