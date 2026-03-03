@@ -23,7 +23,8 @@ class LoginController extends Controller
         if (Auth::attempt($credentials, $request->remember)) {
             $request->session()->regenerate();
 
-            return redirect()->intended(route('dashboard'));
+            $route = Auth::user()->isCashier() ? 'cashier.dashboard' : 'dashboard';
+            return redirect()->intended(route($route));
         }
 
         return back()->withErrors([

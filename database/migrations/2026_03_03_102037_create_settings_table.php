@@ -35,14 +35,14 @@ return new class extends Migration
             ['key' => 'site_banner', 'value' => 'assets/images/promo-banner.jpg', 'created_at' => now(), 'updated_at' => now()],
             
             // --- SEO Metadata ---
-            ['key' => 'meta_title', 'value' => 'Antigravity POS - Next Gen Point of Sale', 'created_at' => now(), 'updated_at' => now()],
+            ['key' => 'meta_title', 'value' => 'POS - Next Gen Point of Sale', 'created_at' => now(), 'updated_at' => now()],
             ['key' => 'meta_description', 'value' => 'The fastest, cloud-based POS system for modern retail and restaurants.', 'created_at' => now(), 'updated_at' => now()],
             ['key' => 'meta_keywords', 'value' => 'pos, point of sale, retail software, inventory management', 'created_at' => now(), 'updated_at' => now()],
             ['key' => 'og_image', 'value' => 'assets/images/og-share.jpg', 'created_at' => now(), 'updated_at' => now()],
             
             // --- Social & Contact ---
-            ['key' => 'facebook_url', 'value' => 'https://facebook.com/antigravitypos', 'created_at' => now(), 'updated_at' => now()],
-            ['key' => 'contact_email', 'value' => 'support@antigravity.io', 'created_at' => now(), 'updated_at' => now()],
+            ['key' => 'facebook_url', 'value' => 'https://facebook.com/pos', 'created_at' => now(), 'updated_at' => now()],
+            ['key' => 'contact_email', 'value' => 'support@pos.io', 'created_at' => now(), 'updated_at' => now()],
         ]);
     }
 
