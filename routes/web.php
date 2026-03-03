@@ -50,4 +50,5 @@ Route::middleware('auth')->group(function () {
     Route::get('/pos/search', [POSController::class, 'searchProduct'])->name('pos.search');
     Route::post('/pos/store', [POSController::class, 'store'])->name('pos.store');
     Route::get('/invoice/{id}', [InvoiceController::class, 'show'])->name('invoice.show');
+    Route::get('/invoice/{id}/download', [InvoiceController::class, 'download'])->name('invoice.download');
 });

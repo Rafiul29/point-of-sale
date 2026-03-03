@@ -13,6 +13,9 @@
             <button onclick="window.print()" class="bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-indigo-600/20 hover:bg-indigo-700 transition-all active:scale-95">
                 <i class="fas fa-print mr-2"></i> Print Receipt
             </button>
+            <a href="{{ route('invoice.download', $sale->id) }}" target="_blank" class="bg-slate-900 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-slate-900/20 hover:bg-slate-800 transition-all active:scale-95">
+                <i class="fas fa-file-pdf mr-2"></i> PDF
+            </a>
         </div>
     </div>
 
@@ -89,10 +92,10 @@
                             {{ $item->quantity }}
                         </td>
                         <td class="px-6 py-6 text-right font-bold text-slate-600 print:px-4 print:py-3">
-                            ${{ number_format($item->unit_price, 2) }}
+                            {{ $settings['currency_symbol'] ?? '$' }}{{ number_format($item->unit_price, 2) }}
                         </td>
                         <td class="px-12 py-6 text-right font-black text-slate-900 print:px-8 print:py-3">
-                            ${{ number_format($item->subtotal, 2) }}
+                            {{ $settings['currency_symbol'] ?? '$' }}{{ number_format($item->subtotal, 2) }}
                         </td>
                     </tr>
                     @endforeach
@@ -109,23 +112,23 @@
                 <div class="w-full md:w-64 space-y-4 print:w-48 print:space-y-2">
                     <div class="flex justify-between items-center text-sm font-bold text-slate-500 print:text-xs">
                         <span>Net Subtotal</span>
-                        <span>${{ number_format($sale->total_amount, 2) }}</span>
+                        <span>{{ $settings['currency_symbol'] ?? '$' }}{{ number_format($sale->total_amount, 2) }}</span>
                     </div>
                     <div class="flex justify-between items-center text-sm font-bold text-slate-500 print:text-xs">
                         <span>Associated Tax</span>
-                        <span>${{ number_format($sale->tax_amount, 2) }}</span>
+                        <span>{{ $settings['currency_symbol'] ?? '$' }}{{ number_format($sale->tax_amount, 2) }}</span>
                     </div>
                     <div class="pt-4 border-t border-slate-200 print:pt-2">
                         <div class="flex justify-between items-end">
                             <span class="text-sm font-black text-slate-900 uppercase print:text-xs">Paid Total</span>
-                            <span class="text-3xl font-black text-indigo-600 tracking-tighter print:text-xl print:text-black">${{ number_format($sale->grand_total, 2) }}</span>
+                            <span class="text-3xl font-black text-indigo-600 tracking-tighter print:text-xl print:text-black">{{ $settings['currency_symbol'] ?? '$' }}{{ number_format($sale->grand_total, 2) }}</span>
                         </div>
                     </div>
 
                     @if($sale->due_amount > 0)
                     <div class="mt-4 p-4 rounded-2xl bg-rose-50 border border-rose-100 flex justify-between items-center print:mt-2 print:p-2 print:bg-white print:border-rose-200">
                         <span class="text-[10px] font-black text-rose-400 uppercase tracking-widest print:text-[8px]">Balance Pending</span>
-                        <span class="text-lg font-black text-rose-500 print:text-sm">${{ number_format($sale->due_amount, 2) }}</span>
+                        <span class="text-lg font-black text-rose-500 print:text-sm">{{ $settings['currency_symbol'] ?? '$' }}{{ number_format($sale->due_amount, 2) }}</span>
                     </div>
                     @endif
                 </div>
@@ -145,9 +148,28 @@
 @push('css')
 <style>
     @media print {
-        @page { margin: 1cm; size: auto; }
-        body { background: white !important; }
-        .flex-1 { p: 0 !important; }
+        @page { 
+            margin: 0; 
+            size: auto; 
+        }
+        body { 
+            background: white !important; 
+            margin: 0 !important; 
+            padding: 0 !important; 
+            -webkit-print-color-adjust: exact;
+        }
+        .ml-72 { margin-left: 0 !important; }
+        main { 
+            padding: 0 !important; 
+            margin: 0 !important; 
+            width: 100% !important;
+        }
+        .max-w-4xl { max-width: 100% !important; width: 100% !important; margin: 0 !important; }
+        .rounded-\[3rem\] { border-radius: 0 !important; }
+        .shadow-2xl { box-shadow: none !important; }
+        
+        /* Hide navbar and sidebar specifically if they leak */
+        header, .print\:hidden { display: none !important; }
     }
 </style>
 @endpush
