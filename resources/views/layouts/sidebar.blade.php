@@ -85,9 +85,23 @@
                 <span class="px-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Analytics</span>
                 <ul class="mt-4 space-y-1">
                     <li>
-                        <a href="{{ route('reports.sales') }}" class="group flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition-all {{ request()->routeIs('reports.*') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30' : 'hover:bg-slate-800 hover:text-white' }}">
-                            <i class="fas fa-chart-pie text-lg opacity-70"></i>
-                            Reports
+                        <a href="{{ route('reports.sales') }}" class="group flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition-all {{ request()->routeIs('reports.sales') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30' : 'hover:bg-slate-800 hover:text-white' }}">
+                            <i class="fas fa-chart-line text-lg opacity-70"></i>
+                            Sales Report
+                        </a>
+                    </li>
+                    
+                    <li>
+                        <a href="{{ route('reports.top-products') }}" class="group flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition-all {{ request()->routeIs('reports.top-products') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30' : 'hover:bg-slate-800 hover:text-white' }}">
+                            <i class="fas fa-trophy text-lg opacity-70"></i>
+                            Top Products
+                        </a>
+                    </li>
+                    
+                    <li>
+                        <a href="{{ route('reports.inventory') }}" class="group flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition-all {{ request()->routeIs('reports.inventory') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30' : 'hover:bg-slate-800 hover:text-white' }}">
+                            <i class="fas fa-warehouse text-lg opacity-70"></i>
+                            Inventory
                         </a>
                     </li>
                 </ul>
@@ -96,6 +110,12 @@
             <div>
                 <span class="px-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">System</span>
                 <ul class="mt-4 space-y-1">
+                    <li>
+                        <a href="{{ route('audit-logs.index') }}" class="group flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition-all {{ request()->routeIs('audit-logs.*') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30' : 'hover:bg-slate-800 hover:text-white' }}">
+                            <i class="fas fa-shield-halved text-lg opacity-70"></i>
+                            Audit Log
+                        </a>
+                    </li>
                     <li>
                         <a href="{{ route('users.index') }}" class="group flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition-all {{ request()->routeIs('users.*') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30' : 'hover:bg-slate-800 hover:text-white' }}">
                             <i class="fas fa-user-cog text-lg opacity-70"></i>

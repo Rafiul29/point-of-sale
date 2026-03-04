@@ -15,6 +15,7 @@ use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AuditLogController;
 
 // Landing Page
 Route::get('/', function () {
@@ -77,8 +78,15 @@ Route::middleware('auth')->group(function () {
         Route::resource('customers', CustomerController::class)->except(['index', 'show']);
 
         // Reports
-        Route::get('/reports/sales', [ReportController::class, 'salesSummary'])->name('reports.sales');
-        Route::get('/reports/inventory', [ReportController::class, 'inventoryReport'])->name('reports.inventory');
+        Route::get('/reports/sales',         [ReportController::class, 'salesSummary'])->name('reports.sales');
+        Route::get('/reports/inventory',     [ReportController::class, 'inventoryReport'])->name('reports.inventory');
+       
+        Route::get('/reports/top-products',  [ReportController::class, 'topProducts'])->name('reports.top-products');
+      
+
+        // Audit Log
+        Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
+        Route::get('/audit-logs/{auditLog}', [AuditLogController::class, 'show'])->name('audit-logs.show');
 
         // Settings
         Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');

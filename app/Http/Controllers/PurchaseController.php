@@ -6,6 +6,7 @@ use App\Models\Purchase;
 use App\Models\PurchaseItem;
 use App\Models\Product;
 use App\Models\Supplier;
+use App\Services\AuditLogService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -21,19 +22,19 @@ class PurchaseController extends Controller
     public function create()
     {
         $suppliers = Supplier::all();
-        $products = Product::all();
+        $products  = Product::all();
         return view('purchases.create', compact('suppliers', 'products'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'supplier_id' => 'required|exists:suppliers,id',
-            'purchase_date' => 'required|date',
-            'items' => 'required|array|min:1',
-            'items.*.product_id' => 'required|exists:products,id',
-            'items.*.quantity' => 'required|integer|min:1',
-            'items.*.unit_price' => 'required|numeric|min:0',
+            'supplier_id'              => 'required|exists:suppliers,id',
+            'purchase_date'            => 'required|date',
+            'items'                    => 'required|array|min:1',
+            'items.*.product_id'       => 'required|exists:products,id',
+            'items.*.quantity'         => 'required|integer|min:1',
+            'items.*.unit_price'       => 'required|numeric|min:0',
         ]);
 
         try {
@@ -52,21 +53,38 @@ class PurchaseController extends Controller
                     'status'        => 'Received',
                 ]);
 
+                $stockChanges = [];
+
                 foreach ($request->items as $item) {
                     $purchase->items()->create([
                         'product_id' => $item['product_id'],
-                        'quantity' => $item['quantity'],
+                        'quantity'   => $item['quantity'],
                         'unit_price' => $item['unit_price'],
-                        'subtotal' => $item['quantity'] * $item['unit_price']
+                        'subtotal'   => $item['quantity'] * $item['unit_price'],
                     ]);
 
-                    // Update product stock
-                    $product = Product::find($item['product_id']);
+                    $product  = Product::find($item['product_id']);
+                    $oldStock = $product->stock_quantity;
+
                     $product->increment('stock_quantity', $item['quantity']);
-                    
-                    // Optionally update purchase price
                     $product->update(['purchase_price' => $item['unit_price']]);
+
+                    $stockChanges[] = [
+                        'product_id'   => $product->id,
+                        'product_name' => $product->name,
+                        'qty_added'    => $item['quantity'],
+                        'stock_before' => $oldStock,
+                        'stock_after'  => $oldStock + $item['quantity'],
+                        'unit_price'   => $item['unit_price'],
+                    ];
                 }
+
+                AuditLogService::log('stock_in', $purchase, [], [
+                    'purchase_id'  => $purchase->id,
+                    'invoice_no'   => $purchase->invoice_no,
+                    'total_amount' => $totalAmount,
+                    'items'        => $stockChanges,
+                ]);
             });
 
             return redirect()->route('purchases.index')->with('success', 'Stock purchase recorded and inventory updated.');
