@@ -49,6 +49,8 @@
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             width: 18rem;
             box-shadow: 10px 0 25px -5px rgba(0, 0, 0, 0.1), 5px 0 10px -5px rgba(0, 0, 0, 0.04);
+            overflow-x: hidden;
+            white-space: nowrap;
         }
 
         .sidebar.open {
@@ -65,7 +67,7 @@
             visibility: hidden;
             width: 0;
             margin: 0;
-            position: absolute;
+            display: none;
             transition: opacity 0.2s ease;
         }
 
@@ -91,7 +93,7 @@
             padding: 0 0.75rem;
         }
 
-        /* Main content margin - animated */
+        /* Main content margin - default for desktop to prevent shift */
         .main-content {
             margin-left: 0;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -116,7 +118,11 @@
             .sidebar {
                 transform: translateX(0);
                 position: fixed;
-                z-index: 40;
+                z-index: 50;
+            }
+
+            .main-content {
+                margin-left: 18rem; /* Default margin to prevent shift */
             }
 
             .main-content.sidebar-open {
@@ -133,15 +139,15 @@
             
             .sidebar.collapsed:hover {
                 width: 18rem;
-                z-index: 50;
+                z-index: 60;
                 box-shadow: 20px 0 25px -5px rgba(0, 0, 0, 0.2);
             }
             
             .sidebar.collapsed:hover .sidebar-text {
                 opacity: 1;
                 visibility: visible;
+                display: inline-block;
                 width: auto;
-                position: static;
                 margin-left: 0.75rem;
             }
             
@@ -169,7 +175,7 @@
         @media (max-width: 1023px) {
             .sidebar {
                 position: fixed;
-                z-index: 50;
+                z-index: 60;
                 transform: translateX(-100%);
                 height: 100vh;
             }
@@ -184,11 +190,27 @@
             }
         }
 
+
         /* Improved Sidebar Active State */
         .nav-link-active {
             background: linear-gradient(to right, rgb(79, 70, 229), rgb(124, 58, 237));
             color: white !important;
             box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4);
+        }
+
+        /* Custom Scrollbar for Sidebar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
         }
 
     </style>
