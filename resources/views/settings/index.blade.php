@@ -77,8 +77,9 @@
                                     <p class="text-[10px] font-bold text-slate-400 mt-2">Upload PNG/SVG</p>
                                 </div>
                             @endif
-                            <input type="file" name="site_logo" class="absolute inset-0 opacity-0 cursor-pointer">
+                            <input type="file" name="site_logo" accept="image/png,image/jpeg,image/webp,image/svg+xml" class="absolute inset-0 opacity-0 cursor-pointer" data-max-size="10485760">
                         </div>
+                        <p class="mt-2 text-xs text-slate-400">Max size: 10MB. Supported: PNG, JPG, JPEG, SVG, WEBP.</p>
                     </div>
 
                     <!-- Favicon Upload -->
@@ -93,8 +94,9 @@
                                     <p class="text-[10px] font-bold text-slate-400 mt-2">Upload ICO/PNG</p>
                                 </div>
                             @endif
-                            <input type="file" name="site_favicon" class="absolute inset-0 opacity-0 cursor-pointer">
+                            <input type="file" name="site_favicon" accept="image/png,image/jpeg,image/webp,image/svg+xml" class="absolute inset-0 opacity-0 cursor-pointer" data-max-size="10485760">
                         </div>
+                        <p class="mt-2 text-xs text-slate-400">Max size: 10MB. Supported: PNG, JPG, JPEG, SVG, WEBP.</p>
                     </div>
 
                     <!-- Banner Upload -->
@@ -109,8 +111,9 @@
                                     <p class="text-[10px] font-bold text-slate-400 mt-2">Recommended size: 1200x400px</p>
                                 </div>
                             @endif
-                            <input type="file" name="site_banner" class="absolute inset-0 opacity-0 cursor-pointer">
+                            <input type="file" name="site_banner" accept="image/png,image/jpeg,image/webp,image/svg+xml" class="absolute inset-0 opacity-0 cursor-pointer" data-max-size="10485760">
                         </div>
+                        <p class="mt-2 text-xs text-slate-400">Max size: 10MB. Supported: PNG, JPG, JPEG, SVG, WEBP.</p>
                     </div>
                 </div>
             </div>
@@ -143,8 +146,9 @@
                                     <p class="text-[10px] font-bold text-slate-400 mt-2">Recommended: 1200x630px</p>
                                 </div>
                             @endif
-                            <input type="file" name="og_image" class="absolute inset-0 opacity-0 cursor-pointer">
+                            <input type="file" name="og_image" accept="image/png,image/jpeg,image/webp,image/svg+xml" class="absolute inset-0 opacity-0 cursor-pointer" data-max-size="10485760">
                         </div>
+                        <p class="mt-2 text-xs text-slate-400">Max size: 10MB. Supported: PNG, JPG, JPEG, SVG, WEBP.</p>
                     </div>
                 </div>
             </div>
@@ -167,6 +171,28 @@
                 </x-button>
             </div>
         </form>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const maxSize = 10 * 1024 * 1024;
+                const fileInputs = document.querySelectorAll('input[type="file"][data-max-size]');
+
+                fileInputs.forEach((input) => {
+                    input.addEventListener('change', function () {
+                        const file = this.files[0];
+                        if (!file) return;
+
+                        const max = Number(this.dataset.maxSize) || maxSize;
+
+                        if (file.size > max) {
+                            alert(`File too large. Maximum allowed size is ${(max / 1024 / 1024).toFixed(1)} MB.`);
+                            this.value = '';
+                        }
+                    });
+                });
+            });
+        </script>
+
     </div>
 </div>
 @endsection

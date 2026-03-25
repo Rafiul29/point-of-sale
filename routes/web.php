@@ -79,6 +79,7 @@ Route::middleware('auth')->group(function () {
 
         // Reports
         Route::get('/reports/sales',         [ReportController::class, 'salesSummary'])->name('reports.sales');
+        Route::get('/reports/sales/export',  [ReportController::class, 'exportSales'])->name('reports.sales.export');
         Route::get('/reports/inventory',     [ReportController::class, 'inventoryReport'])->name('reports.inventory');
        
         Route::get('/reports/top-products',  [ReportController::class, 'topProducts'])->name('reports.top-products');

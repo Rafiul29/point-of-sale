@@ -25,6 +25,8 @@
                     <x-input name="name" label="Full Identity" required placeholder="John Doe" />
                     <x-input name="email" label="Digital Mail" placeholder="john@example.com" />
                     <x-input name="phone" label="Mobile Connection" placeholder="+1..." />
+                    <x-input name="address" label="Physical Address" placeholder="Street, City, Country" />
+                    <x-input name="balance" label="Initial Balance" type="number" step="0.01" min="0" value="0" />
                     <div class="pt-2">
                         <x-button class="w-full !py-4 shadow-indigo-600/20">
                             Register Client
@@ -77,12 +79,15 @@
                                     </span>
                                 </td>
                                 <td class="px-10 py-6 text-right space-x-2">
-                                     <button class="h-9 w-9 inline-flex items-center justify-center rounded-xl bg-slate-100 text-slate-400 hover:bg-slate-900 hover:text-white transition-all shadow-sm">
-                                        <i class="fas fa-eye text-xs"></i>
-                                     </button>
+                                     <a href="{{ route('customers.show', $customer) }}" class="h-9 w-9 inline-flex items-center justify-center rounded-xl bg-slate-100 text-slate-400 hover:bg-slate-900 hover:text-white transition-all shadow-sm" title="View customer">
+                                         <i class="fas fa-eye text-xs"></i>
+                                     </a>
+                                     <a href="{{ route('customers.edit', $customer) }}" class="h-9 w-9 inline-flex items-center justify-center rounded-xl bg-slate-100 text-slate-400 hover:bg-indigo-600 hover:text-white transition-all shadow-sm" title="Edit customer">
+                                         <i class="fas fa-edit text-xs"></i>
+                                     </a>
                                      <form action="{{ route('customers.destroy', $customer) }}" method="POST" class="inline">
                                         @csrf @method('DELETE')
-                                        <button type="submit" class="h-9 w-9 inline-flex items-center justify-center rounded-xl bg-rose-50 text-rose-400 hover:bg-rose-500 hover:text-white transition-all shadow-sm" onclick="return confirm('Archive client?')">
+                                        <button type="submit" class="h-9 w-9 inline-flex items-center justify-center rounded-xl bg-rose-50 text-rose-400 hover:bg-rose-500 hover:text-white transition-all shadow-sm" onclick="return confirm('Archive client?')" title="Archive customer">
                                             <i class="fas fa-trash-alt text-xs"></i>
                                         </button>
                                      </form>

@@ -79,9 +79,9 @@
                 <p class="text-sm font-medium text-slate-400 mt-1 italic">Detailed audit log of all validated client operations</p>
             </div>
             <div class="flex gap-4">
-                 <button class="h-12 px-6 rounded-2xl bg-slate-100 text-slate-600 font-black text-[10px] uppercase tracking-widest hover:bg-slate-900 hover:text-white transition-all flex items-center gap-3">
-                    <i class="fas fa-file-excel text-sm"></i> Export CSV
-                </button>
+                 <a href="{{ route('reports.sales.export', ['start_date' => $startDate->format('Y-m-d'), 'end_date' => $endDate->format('Y-m-d')]) }}" class="h-12 px-6 rounded-2xl bg-slate-100 text-slate-600 font-black text-[10px] uppercase tracking-widest hover:bg-slate-900 hover:text-white transition-all flex items-center gap-3">
+                    <i class="fas fa-file-excel text-sm"></i> Export
+                </a>
             </div>
         </div>
         <div class="overflow-x-auto">

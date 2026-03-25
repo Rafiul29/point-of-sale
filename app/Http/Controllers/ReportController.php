@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\SalesReportExport;
 use App\Models\Sale;
 use App\Models\Purchase;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ReportController extends Controller
 {
@@ -32,6 +34,15 @@ class ReportController extends Controller
         return view('reports.sales', compact('sales', 'stats', 'startDate', 'endDate'));
     }
 
+    public function exportSales(Request $request)
+    {
+        $startDate = $request->start_date ? Carbon::parse($request->start_date) : Carbon::now()->startOfMonth();
+        $endDate   = $request->end_date   ? Carbon::parse($request->end_date)   : Carbon::now()->endOfMonth();
+
+        $fileName = 'sales_report_' . now()->format('Ymd_His') . '.xlsx';
+
+        return Excel::download(new SalesReportExport($startDate, $endDate), $fileName);
+    }
 
     public function inventoryReport()
     {

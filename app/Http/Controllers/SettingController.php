@@ -16,6 +16,27 @@ class SettingController extends Controller
 
 public function update(Request $request)
 {
+    $maxUploadSizeKb = 10240; // 10MB per file
+
+    $validated = $request->validate([
+        'shop_name' => 'nullable|string|max:255',
+        'contact_email' => 'nullable|email|max:255',
+        'shop_phone' => 'nullable|string|max:50',
+        'shop_address' => 'nullable|string|max:1000',
+        'currency_symbol' => 'nullable|string|max:10',
+        'tax_percentage' => 'nullable|numeric|min:0|max:100',
+
+        'site_logo' => "nullable|file|image|mimes:jpg,jpeg,png,svg,webp|max:{$maxUploadSizeKb}",
+        'site_favicon' => "nullable|file|image|mimes:jpg,jpeg,png,svg,webp|max:{$maxUploadSizeKb}",
+        'site_banner' => "nullable|file|image|mimes:jpg,jpeg,png,svg,webp|max:{$maxUploadSizeKb}",
+        'og_image' => "nullable|file|image|mimes:jpg,jpeg,png,svg,webp|max:{$maxUploadSizeKb}",
+    ], [
+        'site_logo.max' => 'Logo must be 10MB or smaller.',
+        'site_favicon.max' => 'Favicon must be 10MB or smaller.',
+        'site_banner.max' => 'Banner must be 10MB or smaller.',
+        'og_image.max' => 'OpenGraph image must be 10MB or smaller.',
+    ]);
+
     $data = $request->except('_token');
     
     // Specify keys that handle file uploads
