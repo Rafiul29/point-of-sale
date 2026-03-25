@@ -4,9 +4,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SnapPOS — The Modern Point of Sale System</title>
-    <meta name="description"
-        content="The all-in-one point of sale system built for modern retail. Manage inventory, track sales, and delight customers.">
+    <title>ZipsoftBD POS Management Software | Best POS System in Bangladesh</title>
+    <meta name="description" content="ZipsoftBD POS is the leading POS management software for stores and restaurants in Bangladesh. Efficient inventory, sales, and customer management in one powerful dashboard." />
+    <meta name="keywords" content="ZipsoftBD, POS management software, point of sale software, retail POS, restaurant POS, Bangladesh" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="{{ url()->current() }}" />
+    <meta property="og:title" content="ZipsoftBD POS Management Software | Best POS System in Bangladesh" />
+    <meta property="og:description" content="ZipsoftBD POS is the leading POS management software for stores and restaurants in Bangladesh. Efficient inventory, sales, and customer management in one powerful dashboard." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="{{ url()->current() }}" />
+    <meta property="og:image" content="{{ asset('images/zipsoftbd-pos-preview.png') }}" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="ZipsoftBD POS Management Software | Best POS System in Bangladesh" />
+    <meta name="twitter:description" content="ZipsoftBD POS is the leading POS management software for stores and restaurants in Bangladesh." />
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -347,7 +357,7 @@
 <body>
 
 
-    <nav id="navbar" class="px-6 py-4">
+     <nav id="navbar" class="px-6 py-4">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
 
 
@@ -367,11 +377,23 @@
             </div>
 
             <div class="hidden md:flex items-center gap-3">
-                <a href="{{ route('login') }}" class="nav-link px-4 py-2">Log in</a>
-                <a href="{{ route('login') }}" class="btn-primary" style="padding:.6rem 1.3rem;font-size:.85rem">
-                    <i class="fas fa-rocket" style="font-size:.8rem"></i>
-                    Get Started
-                </a>
+                @if (!auth()->check())
+                    <a href="{{ route('login') }}" class="nav-link px-4 py-2">Log in</a>
+                    <a href="{{ route('login') }}" class="btn-primary" style="padding:.6rem 1.3rem;font-size:.85rem">
+                        <i class="fas fa-rocket" style="font-size:.8rem"></i>
+                        Get Started
+                    </a>
+                @elseif(auth()->user()->role === 'Admin')
+                    <a href="{{ route('dashboard') }}" class="btn-primary" style="padding:.6rem 1.3rem;font-size:.85rem">
+                        <i class="fas fa-gauge" style="font-size:.8rem"></i>
+                        Dashboard
+                    </a>
+                @else
+                    <a href="{{ route('cashier.dashboard') }}" class="btn-primary" style="padding:.6rem 1.3rem;font-size:.85rem">
+                        <i class="fas fa-cash-register" style="font-size:.8rem"></i>
+                        POS Terminal
+                    </a>
+                @endif
             </div>
 
 
@@ -387,16 +409,29 @@
         </div>
 
         <div id="mobile-menu" class="md:hidden mt-4 pb-4 border-t" style="border-color:var(--lp-border)">
-            <div class="flex flex-col gap-4 pt-4">
+            <div class="flex flex-col gap-4 pt-4 ">
                 <a href="#features" class="nav-link pl-2">Features</a>
                 <a href="#how-it-works" class="nav-link pl-2">How It Works</a>
                 <a href="#stats" class="nav-link pl-2">Why Us</a>
-                <div class="flex gap-3 pt-2 pl-2">
-                    <a href="{{ route('login') }}" class="btn-outline" style="padding:.6rem 1.2rem;font-size:.85rem">Log
-                        in</a>
-                    <a href="{{ route('login') }}" class="btn-primary" style="padding:.6rem 1.2rem;font-size:.85rem">Get
-                        Started</a>
-                </div>
+
+                @if (!auth()->check())
+                    <div class="flex gap-3 pt-2 pl-2">
+                        <a href="{{ route('login') }}" class="btn-outline"
+                            style="padding:.6rem 1.2rem;font-size:.85rem">Log in</a>
+                        <a href="{{ route('login') }}" class="btn-primary"
+                            style="padding:.6rem 1.2rem;font-size:.85rem">Get Started</a>
+                    </div>
+                @elseif(auth()->user()->role === 'Admin')
+                    <div class="flex gap-3 pt-2 pl-2">
+                        <a href="{{ route('dashboard') }}" class="btn-primary"
+                            style="padding:.6rem 1.2rem;font-size:.85rem">Go to Dashboard</a>
+                    </div>
+                @else
+                    <div class="flex gap-3 pt-2 pl-2">
+                        <a href="{{ route('cashier.dashboard') }}" class="btn-primary"
+                            style="padding:.6rem 1.2rem;font-size:.85rem">Go to POS Terminal</a>
+                    </div>
+                @endif
             </div>
         </div>
     </nav>

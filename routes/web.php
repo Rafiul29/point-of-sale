@@ -19,12 +19,7 @@ use App\Http\Controllers\AuditLogController;
 
 // Landing Page
 Route::get('/', function () {
-    if (auth()->check()) {
-        $role = auth()->user()->role ?? 'Cashier';
-        return $role === 'Admin'
-            ? redirect()->route('dashboard')
-            : redirect()->route('cashier.dashboard');
-    }
+
     return view('landing');
 })->name('landing');
 
