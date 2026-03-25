@@ -3,7 +3,7 @@
 @section('header', 'Workstation Control Center')
 
 @section('content')
-<div class="flex flex-col gap-10">
+<div class="flex flex-col gap-10 p-5">
     <!-- Premium Stats Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <!-- Sales Velocity -->
