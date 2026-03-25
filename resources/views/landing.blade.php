@@ -4,19 +4,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZipsoftBD POS Management Software | Best POS System in Bangladesh</title>
-    <meta name="description" content="ZipsoftBD POS is the leading POS management software for stores and restaurants in Bangladesh. Efficient inventory, sales, and customer management in one powerful dashboard." />
-    <meta name="keywords" content="ZipsoftBD, POS management software, point of sale software, retail POS, restaurant POS, Bangladesh" />
+    <title>{{ $settings['meta_title'] ?? 'SnapPOS Management Software | Best POS System' }}</title>
+    <meta name="description" content="{{ $settings['meta_description'] ?? 'SnapPOS is the leading POS management software for stores and restaurants in Bangladesh. Efficient inventory, sales, and customer management in one powerful dashboard.' }}" />
+    <meta name="keywords" content="{{ $settings['meta_keywords'] ?? 'SnapPOS, POS management software, point of sale software, retail POS, restaurant POS, Bangladesh' }}" />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="{{ url()->current() }}" />
-    <meta property="og:title" content="ZipsoftBD POS Management Software | Best POS System in Bangladesh" />
-    <meta property="og:description" content="ZipsoftBD POS is the leading POS management software for stores and restaurants in Bangladesh. Efficient inventory, sales, and customer management in one powerful dashboard." />
+    @if(isset($settings['site_favicon']))
+    <link rel="icon" href="{{ asset('storage/' . $settings['site_favicon']) }}">
+    @else
+    <link rel="icon" href="{{ asset('favicon.ico') }}">
+    @endif
+    <meta property="og:title" content="{{ $settings['meta_title'] ?? 'SnapPOS Management Software | Best POS System' }}" />
+    <meta property="og:description" content="{{ $settings['meta_description'] ?? 'SnapPOS is the leading POS management software for stores and restaurants in Bangladesh. Efficient inventory, sales, and customer management in one powerful dashboard.' }}" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="{{ url()->current() }}" />
-    <meta property="og:image" content="{{ asset('images/zipsoftbd-pos-preview.png') }}" />
+    <meta property="og:image" content="{{ isset($settings['og_image']) ? asset('storage/' . $settings['og_image']) : asset('images/zipsoftbd-pos-preview.png') }}" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="ZipsoftBD POS Management Software | Best POS System in Bangladesh" />
-    <meta name="twitter:description" content="ZipsoftBD POS is the leading POS management software for stores and restaurants in Bangladesh." />
+    <meta name="twitter:title" content="{{ $settings['meta_title'] ?? 'SnapPOS Management Software | Best POS System' }}" />
+    <meta name="twitter:description" content="{{ $settings['meta_description'] ?? 'SnapPOS is the leading POS management software for stores and restaurants in Bangladesh.' }}" />
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -363,11 +368,15 @@
 
             <a href="/" class="flex items-center gap-2.5" style="text-decoration:none">
                 <div
-                    style="width:2.2rem;height:2.2rem;border-radius:.625rem;background:var(--lp-primary);display:flex;align-items:center;justify-content:center;box-shadow:0 0 20px rgba(79,70,229,.5)">
-                    <i class="fas fa-bolt" style="color:#fff;font-size:.9rem"></i>
+                    style="width:2.2rem;height:2.2rem;border-radius:.625rem;background:var(--lp-primary);display:flex;align-items:center;justify-content:center;box-shadow:0 0 20px rgba(79,70,229,.5);overflow:hidden;">
+                    @if(isset($settings['site_logo']))
+                        <img src="{{ asset('storage/' . $settings['site_logo']) }}" alt="{{ $settings['shop_name'] ?? 'Logo' }}" style="width:100%;height:100%;object-fit:cover;">
+                    @else
+                        <i class="fas fa-bolt" style="color:#fff;font-size:.9rem"></i>
+                    @endif
                 </div>
                 <span
-                    style="font-family:var(--font-head);font-weight:700;font-size:1.15rem;color:var(--lp-text)">SnapPOS</span>
+                    style="font-family:var(--font-head);font-weight:700;font-size:1.15rem;color:var(--lp-text)">{{ $settings['shop_name'] ?? 'SnapPOS' }}</span>
             </a>
 
             <div class="hidden md:flex items-center gap-8">
@@ -439,7 +448,7 @@
 
 
     <section class="aurora-wrap"
-        style="min-height:100vh;display:flex;align-items:center;padding-top:7rem;padding-bottom:6rem;position:relative">
+        style="min-height:100vh;display:flex;align-items:center;padding-top:7rem;padding-bottom:6rem;position:relative;">
         <div class="aurora-blob-3"></div>
         <div class="max-w-7xl mx-auto px-6 w-full" style="position:relative;z-index:1">
             <div class="grid lg:grid-cols-2 gap-16 items-center">
@@ -497,8 +506,8 @@
                 <div class="reveal" style="position:relative;padding:2rem 0">
 
 
-                    <div class="stat-card glass-card"
-                        style="top:-1.5rem;left:-1rem;z-index:10;animation:floatBlob 6s ease-in-out infinite alternate">
+                    <div class="stat-card glass-card stat-card-1"
+                        style="z-index:10;animation:floatBlob 6s ease-in-out infinite alternate">
                         <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.3rem">
                             <div
                                 style="width:1.8rem;height:1.8rem;border-radius:.5rem;background:rgba(16,185,129,.15);display:flex;align-items:center;justify-content:center">
@@ -514,8 +523,8 @@
                     </div>
 
 
-                    <div class="stat-card glass-card"
-                        style="bottom:0rem;right:-1rem;z-index:10;animation:floatBlob 8s ease-in-out infinite alternate-reverse">
+                    <div class="stat-card glass-card stat-card-2"
+                        style="z-index:10;animation:floatBlob 8s ease-in-out infinite alternate-reverse">
                         <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.3rem">
                             <div
                                 style="width:1.8rem;height:1.8rem;border-radius:.5rem;background:rgba(79,70,229,.15);display:flex;align-items:center;justify-content:center">
@@ -676,12 +685,11 @@
             </div>
 
 
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:auto auto;gap:1.25rem"
-                class="reveal">
+            <div class="grid-features reveal">
 
 
-                <div class="feature-card"
-                    style="grid-row:span 2;display:flex;flex-direction:column;justify-content:space-between;background:linear-gradient(135deg,rgba(79,70,229,.08),rgba(109,40,217,.06))">
+                <div class="feature-card feature-card-row-span-2"
+                    style="display:flex;flex-direction:column;justify-content:space-between;background:linear-gradient(135deg,rgba(79,70,229,.08),rgba(109,40,217,.06))">
                     <div>
                         <div class="feature-icon">
                             <i class="fas fa-cash-register"></i>
@@ -748,7 +756,7 @@
                 </div>
 
 
-                <div class="feature-card" style="grid-column:span 2;display:flex;align-items:center;gap:2rem">
+                <div class="feature-card feature-card-col-span-2" style="display:flex;gap:2rem">
                     <div style="flex:1">
                         <div style="display:flex;gap:1.2rem;margin-bottom:1.25rem">
                             <div class="feature-icon"
@@ -815,8 +823,7 @@
                 </p>
             </div>
 
-            <div class="reveal"
-                style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:start;gap:0">
+            <div class="reveal grid-how-it-works">
 
                 @foreach ([['01', 'fa-user-plus', 'Create Your Account', 'Sign up and configure your store settings, logo, and business details in under 5 minutes.', 'var(--lp-primary)'], ['02', 'fa-box-open', 'Set Up Your Products', 'Import your product catalog, set prices, manage categories, and configure suppliers with ease.', 'var(--lp-cyan)'], ['03', 'fa-rocket', 'Start Selling', 'Launch your POS terminal and start processing sales immediately. It&apos;s that simple.', 'var(--lp-success)']] as $i => [$num, $icon, $title, $desc, $clr])
                     <div style="text-align:center;padding:0 1rem">
@@ -837,7 +844,7 @@
                     </div>
 
                     @if (!$loop->last)
-                        <div style="display:flex;align-items:center;padding-top:2rem">
+                        <div class="step-chevron">
                             <div
                                 style="width:80px;height:2px;background:linear-gradient(90deg,rgba(79,70,229,.5),rgba(79,70,229,.1));border-top:2px dashed rgba(79,70,229,.3)">
                             </div>
@@ -899,16 +906,41 @@
                     <a href="/"
                         style="display:inline-flex;align-items:center;gap:.75rem;text-decoration:none;margin-bottom:1rem">
                         <div
-                            style="width:2rem;height:2rem;border-radius:.5rem;background:var(--lp-primary);display:flex;align-items:center;justify-content:center">
-                            <i class="fas fa-bolt" style="color:#fff;font-size:.8rem"></i>
+                            style="width:2rem;height:2rem;border-radius:.5rem;background:var(--lp-primary);display:flex;align-items:center;justify-content:center;overflow:hidden;">
+                            @if(isset($settings['site_logo']))
+                                <img src="{{ asset('storage/' . $settings['site_logo']) }}" alt="Logo" style="width:100%;height:100%;object-fit:cover;">
+                            @else
+                                <i class="fas fa-bolt" style="color:#fff;font-size:.8rem"></i>
+                            @endif
                         </div>
                         <span
-                            style="font-family:var(--font-head);font-weight:700;font-size:1rem;color:var(--lp-text)">SnapPOS</span>
+                            style="font-family:var(--font-head);font-weight:700;font-size:1rem;color:var(--lp-text)">{{ $settings['shop_name'] ?? 'SnapPOS' }}</span>
                     </a>
+                    
+                    @if(isset($settings['shop_address']) || isset($settings['shop_phone']))
+                    <div style="font-size:.85rem;color:var(--lp-muted);line-height:1.65;margin-bottom:1rem;">
+                        @if(isset($settings['shop_address']))
+                        <div style="display:flex;gap:0.5rem;align-items:flex-start;"><i class="fas fa-map-marker-alt" style="margin-top:0.2rem;width:1rem;"></i> <span>{{ $settings['shop_address'] }}</span></div>
+                        @endif
+                        @if(isset($settings['shop_phone']))
+                        <div style="display:flex;gap:0.5rem;align-items:center;margin-top:0.4rem;"><i class="fas fa-phone-alt" style="width:1rem;"></i> <span>{{ $settings['shop_phone'] }}</span></div>
+                        @endif
+                    </div>
+                    @else
                     <p style="font-size:.85rem;color:var(--lp-muted);line-height:1.65;max-width:240px">The modern POS
                         system for ambitious retailers.</p>
+                    @endif
+
                     <div style="display:flex;gap:.75rem;margin-top:1.25rem">
-                        @foreach (['fa-twitter', 'fa-linkedin', 'fa-github', 'fa-instagram'] as $si)
+                        @if(isset($settings['facebook_url']))
+                            <a href="{{ $settings['facebook_url'] }}" target="_blank"
+                                style="width:2rem;height:2rem;border-radius:.5rem;background:var(--lp-faint);border:1px solid var(--lp-border);display:flex;align-items:center;justify-content:center;color:var(--lp-muted);text-decoration:none;transition:color .2s,border-color .2s"
+                                onmouseover="this.style.color='var(--lp-text)';this.style.borderColor='rgba(255,255,255,.2)'"
+                                onmouseout="this.style.color='var(--lp-muted)';this.style.borderColor='var(--lp-border)'">
+                                <i class="fab fa-facebook-f" style="font-size:.75rem"></i>
+                            </a>
+                        @endif
+                        @foreach (['fa-twitter', 'fa-linkedin', 'fa-instagram'] as $si)
                             <a href="#"
                                 style="width:2rem;height:2rem;border-radius:.5rem;background:var(--lp-faint);border:1px solid var(--lp-border);display:flex;align-items:center;justify-content:center;color:var(--lp-muted);text-decoration:none;transition:color .2s,border-color .2s"
                                 onmouseover="this.style.color='var(--lp-text)';this.style.borderColor='rgba(255,255,255,.2)'"
@@ -965,9 +997,9 @@
             </div>
 
             <div
-                style="border-top:1px solid var(--lp-border);padding-top:1.75rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.75rem">
-                <p style="font-size:.8rem;color:var(--lp-muted)">&copy; 2026 SnapPOS. All rights reserved.</p>
-                <div style="display:flex;gap:1.5rem">
+                style=" border-top:1px solid var(--lp-border);padding-top:1.75rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.75rem">
+                <p class="order-2 md:order-1" style="font-size:.8rem;color:var(--lp-muted)">&copy; {{ date('Y') }} {{ $settings['shop_name'] ?? 'SnapPOS' }}. All rights reserved.</p>
+                <div style="display:flex;gap:1.5rem order-1 md:order-2">
                     @foreach (['Privacy Policy', 'Terms of Service', 'Cookie Policy'] as $link)
                         <a href="#"
                             style="font-size:.8rem;color:var(--lp-muted);text-decoration:none;transition:color .2s"
@@ -1022,10 +1054,85 @@
         </script>
 
         <style>
+            .stat-card-1 {
+                top: -1.5rem;
+                left: -1rem;
+            }
+
+            .stat-card-2 {
+                bottom: 0rem;
+                right: -1rem;
+            }
+
+            .grid-features {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1.25rem;
+            }
+
+            .feature-card-row-span-2 {
+                grid-row: span 2;
+            }
+
+            .feature-card-col-span-2 {
+                grid-column: span 2;
+                align-items: center;
+            }
+
+            .grid-how-it-works {
+                display: grid;
+                grid-template-columns: 1fr auto 1fr auto 1fr;
+                align-items: start;
+                gap: 0;
+            }
+
+            .step-chevron {
+                display: flex;
+                align-items: center;
+                padding-top: 2rem;
+            }
+
+            @media (max-width: 1024px) {
+                .grid-features {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+
+                .feature-card-row-span-2 {
+                    grid-row: auto;
+                }
+
+                .feature-card-col-span-2 {
+                    grid-column: span 2;
+                }
+            }
+
             @media (max-width: 768px) {
                 .grid-footer {
                     grid-template-columns: 1fr 1fr !important;
                     gap: 2rem !important;
+                }
+
+                .stat-card-1, .stat-card-2 {
+                    display: none;
+                }
+
+                .grid-features {
+                    grid-template-columns: 1fr;
+                }
+
+                .feature-card-col-span-2 {
+                    grid-column: span 1;
+                    flex-direction: column !important;
+                    align-items: flex-start !important;
+                }
+
+                .grid-how-it-works {
+                    grid-template-columns: 1fr;
+                    gap: 2rem;
+                }
+
+                .step-chevron {
+                    display: none !important;
                 }
             }
 

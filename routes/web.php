@@ -1,26 +1,26 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\CashierDashboardController;
-use App\Http\Controllers\POSController;
-use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\CashierDashboardController;
 use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\SupplierController;
-use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\POSController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\AuditLogController;
+use App\Models\Setting;
+use Illuminate\Support\Facades\Route;
 
 // Landing Page
 Route::get('/', function () {
-
-    return view('landing');
+    $settings = Setting::pluck('value', 'key');
+    return view('landing', compact('settings'));
 })->name('landing');
 
 // Auth Routes
