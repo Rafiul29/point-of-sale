@@ -1,4 +1,4 @@
-<div id="sidebar" class="sidebar fixed inset-y-0 left-0 z-40 bg-slate-900 text-slate-300 shadow-2xl lg:translate-x-0 overflow-hidden">
+<div id="sidebar" class="sidebar fixed inset-y-0 left-0 z-40 bg-[#352BA1] text-slate-300 shadow-2xl lg:translate-x-0 overflow-hidden">
     <div class="flex h-full flex-col px-4 py-6">
         <!-- Close button for mobile -->
         <button onclick="closeSidebar()" class="absolute top-4 right-4 lg:hidden text-slate-400 hover:text-white transition-colors">

@@ -1,154 +1,351 @@
 @extends('layouts.app')
 
-@section('header', 'Workstation Control Center')
+@section('header', 'Dashboard Overview')
 
 @section('content')
-<div class="flex flex-col gap-10 p-5">
-    <!-- Premium Stats Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <!-- Sales Velocity -->
-        <div class="group relative overflow-hidden rounded-[3rem] bg-indigo-600 p-10 text-white shadow-2xl shadow-indigo-600/30 transition-all hover:scale-[1.02]">
-            <div class="relative z-10">
-                <p class="text-[10px] font-black uppercase tracking-[0.3em] opacity-60">Terminal Revenue Today</p>
-                <h3 class="mt-4 text-5xl font-black tracking-tighter">{{ $settings['currency_symbol'] ?? '$' }}{{ number_format($stats['revenue_today'], 2) }}</h3>
-                <div class="mt-8 flex items-center gap-4">
-                    <span class="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-md">
-                        <i class="fas fa-bolt text-indigo-200"></i>
-                    </span>
-                    <div class="text-[10px] font-bold text-indigo-100 uppercase tracking-widest leading-tight">Live transactions<br>from active terminal</div>
+    <div class="flex flex-col gap-6 p-2 sm:p-0">
+        <!-- Welcome Banner/Hero Segment -->
+        <div
+            class="relative overflow-hidden rounded-3xl bg-linear-to-r from-[#6366f1] via-[#a855f7] to-[#ec4899] p-8 text-white shadow-xl shadow-indigo-200">
+            <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div>
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="p-1.5 bg-white/20 rounded-lg backdrop-blur-md">
+                            <i class="fas fa-sparkles text-sm"></i>
+                        </span>
+                        <h2 class="text-2xl font-extrabold tracking-tight">Welcome Back!</h2>
+                    </div>
+                    <p class="text-indigo-50 font-medium opacity-90">Here's what's happening with your store today.</p>
+                </div>
+                <a href="{{ route('pos.index') }}"
+                    class="group flex items-center justify-center gap-2 rounded-2xl bg-white px-6 py-3.5 text-sm font-bold text-indigo-600 transition-all hover:scale-105 active:scale-95 shadow-lg shadow-black/5">
+                    <i class="fas fa-shopping-cart text-xs transition-transform group-hover:rotate-12"></i>
+                    New Sale
+                </a>
+            </div>
+            <!-- Decorative Elements -->
+            <div class="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/10 blur-3xl"></div>
+            <div class="absolute -left-10 -bottom-10 h-40 w-40 rounded-full bg-indigo-500/20 blur-3xl"></div>
+        </div>
+
+        <!-- Key Metrics Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Revenue Card -->
+            <div
+                class="group relative overflow-hidden rounded-4xl bg-white p-6 shadow-sm border border-slate-100 transition-all hover:shadow-xl hover:shadow-indigo-500/10">
+                <div class="absolute left-0 top-0 h-full w-1 bg-emerald-500"></div>
+                <div class="flex items-start justify-between mb-4">
+                    <div
+                        class="h-12 w-12 flex items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 transition-transform group-hover:scale-110">
+                        <i class="fas fa-dollar-sign text-xl"></i>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Today's Revenue</p>
+                        <h3 class="text-2xl font-black text-slate-900">
+                            {{ $settings['currency_symbol'] ?? '$' }}{{ number_format($stats['revenue_today'], 2) }}</h3>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 pt-2 border-t border-slate-50">
+                    <span
+                        class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ $stats['transactions_today'] }}
+                        transactions</span>
                 </div>
             </div>
-            <i class="fas fa-chart-line absolute -bottom-10 -right-10 text-[12rem] opacity-10 transition-transform duration-1000 group-hover:rotate-12 group-hover:scale-110"></i>
-        </div>
 
-        <!-- Profit/Loss Metric -->
-        <div class="group relative overflow-hidden rounded-[3rem] bg-white p-10 shadow-sm border border-slate-100 transition-all hover:shadow-xl hover:shadow-slate-200/50">
-            <div class="relative z-10">
-                <p class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Inventory Acquisitions</p>
-                <h3 class="mt-4 text-5xl font-black tracking-tighter text-slate-900">{{ $settings['currency_symbol'] ?? '$' }}{{ number_format($stats['purchase_month'], 2) }}</h3>
-                <div class="mt-8 flex items-center gap-3 text-xs font-bold text-rose-500">
-                    <div class="h-1.5 w-1.5 rounded-full bg-rose-500 animate-pulse"></div>
-                    Outflow: Current Month
+            <!-- Sales Count Card -->
+            <div
+                class="group relative overflow-hidden rounded-4xl bg-white p-6 shadow-sm border border-slate-100 transition-all hover:shadow-xl hover:shadow-indigo-500/10">
+                <div class="absolute left-0 top-0 h-full w-1 bg-blue-500"></div>
+                <div class="flex items-start justify-between mb-4">
+                    <div
+                        class="h-12 w-12 flex items-center justify-center rounded-2xl bg-blue-50 text-blue-600 transition-transform group-hover:scale-110">
+                        <i class="fas fa-shopping-cart text-xl"></i>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Total Sales</p>
+                        <h3 class="text-2xl font-black text-slate-900">{{ number_format($stats['total_sales_count']) }}</h3>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 pt-2 border-t border-slate-50">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Avg:
+                        {{ $settings['currency_symbol'] ?? '$' }}{{ number_format($stats['total_sales_avg'], 2) }}</span>
                 </div>
             </div>
-            <i class="fas fa-truck-loading absolute -bottom-10 -right-10 text-[12rem] text-slate-50 transition-transform duration-1000 group-hover:-rotate-6"></i>
+
+            <!-- Products Card -->
+            <div
+                class="group relative overflow-hidden rounded-4xl bg-white p-6 shadow-sm border border-slate-100 transition-all hover:shadow-xl hover:shadow-indigo-500/10">
+                <div class="absolute left-0 top-0 h-full w-1 bg-purple-500"></div>
+                <div class="flex items-start justify-between mb-4">
+                    <div
+                        class="h-12 w-12 flex items-center justify-center rounded-2xl bg-purple-50 text-purple-600 transition-transform group-hover:scale-110">
+                        <i class="fas fa-box text-xl"></i>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Total Products</p>
+                        <h3 class="text-2xl font-black text-slate-900">{{ number_format($stats['total_products']) }}</h3>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 pt-2 border-t border-slate-50">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Stock:
+                        {{ number_format($stats['total_stock']) }} units</span>
+                </div>
+            </div>
+
+            <!-- Stock Value Card -->
+            <div
+                class="group relative overflow-hidden rounded-4xl bg-white p-6 shadow-sm border border-slate-100 transition-all hover:shadow-xl hover:shadow-indigo-500/10">
+                <div class="absolute left-0 top-0 h-full w-1 bg-orange-500"></div>
+                <div class="flex items-start justify-between mb-4">
+                    <div
+                        class="h-12 w-12 flex items-center justify-center rounded-2xl bg-orange-50 text-orange-600 transition-transform group-hover:scale-110">
+                        <i class="fas fa-chart-line text-xl"></i>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Stock Value</p>
+                        <h3 class="text-2xl font-black text-slate-900">
+                            {{ $settings['currency_symbol'] ?? '$' }}{{ number_format($stats['stock_value'], 2) }}</h3>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 pt-2 border-t border-slate-50">
+                    <span
+                        class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ $stats['total_categories'] }}
+                        categories</span>
+                </div>
+            </div>
         </div>
 
-        <!-- Customer Base & Catalog -->
-        <div class="grid grid-rows-2 gap-8">
-            <div class="group relative flex items-center gap-6 rounded-[2rem] bg-slate-900 p-6 text-white transition-all hover:bg-slate-800">
-                 <div class="h-16 w-16 flex items-center justify-center rounded-2xl bg-white/5 text-2xl text-indigo-400">
-                    <i class="fas fa-users"></i>
-                 </div>
-                 <div>
-                    <h4 class="text-3xl font-black">{{ $stats['total_customers'] }}</h4>
-                    <p class="text-[10px] font-bold uppercase tracking-widest text-slate-500">Verified Client Identities</p>
-                 </div>
-            </div>
-            <div class="group relative flex items-center gap-6 rounded-[2rem] bg-white p-6 border border-slate-100 transition-all hover:bg-slate-50">
-                 <div class="h-16 w-16 flex items-center justify-center rounded-2xl bg-indigo-50 text-2xl text-indigo-600">
-                    <i class="fas fa-box-open"></i>
-                 </div>
-                 <div>
-                    <h4 class="text-3xl font-black text-slate-900">{{ $stats['total_products'] }}</h4>
-                    <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">SKU managed in catalog</p>
-                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Insights Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
-        <!-- Stock Criticality -->
-        <div class="lg:col-span-8 flex flex-col gap-6">
-            <div class="rounded-[3.5rem] bg-white p-12 shadow-sm border border-slate-100 flex-1">
-                <div class="mb-10 flex items-center justify-between">
+        <!-- Insights Row: Charts -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Revenue Trend Chart -->
+            <div class="rounded-4xl bg-white p-8 shadow-sm border border-slate-100">
+                <div class="flex items-center justify-between mb-6">
                     <div>
-                        <h2 class="text-3xl font-black tracking-tight text-slate-900">Inventory Criticality</h2>
-                        <p class="text-sm font-medium text-slate-400 mt-1">Real-time alerts for stock levels below reorder threshold</p>
+                        <h4 class="text-lg font-extrabold text-slate-900">Revenue Trend</h4>
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Last 7 days</p>
                     </div>
-                    <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-50 text-rose-500">
-                        <i class="fas fa-shield-virus text-xl"></i>
+                    <a href="{{ route('reports.sales') }}"
+                        class="text-xs font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1">
+                        View All <i class="fas fa-arrow-right text-[10px]"></i>
+                    </a>
+                </div>
+                <div class="h-64 relative">
+                    <canvas id="revenueTrendChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Sales Volume Chart -->
+            <div class="rounded-4xl bg-white p-8 shadow-sm border border-slate-100">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h4 class="text-lg font-extrabold text-slate-900">Sales Volume</h4>
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Last 7 days</p>
                     </div>
+                    <a href="{{ route('reports.sales') }}"
+                        class="text-xs font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1">
+                        View All <i class="fas fa-arrow-right text-[10px]"></i>
+                    </a>
+                </div>
+                <div class="h-64 relative">
+                    <canvas id="salesVolumeChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Secondary Data Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Top Products List -->
+            <div class="rounded-4xl bg-white p-8 shadow-sm border border-slate-100">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h4 class="text-lg font-extrabold text-slate-900">Top Products</h4>
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">By revenue</p>
+                    </div>
+                    <a href="{{ route('products.index') }}"
+                        class="text-xs font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1">
+                        View All <i class="fas fa-arrow-right text-[10px]"></i>
+                    </a>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    @forelse($lowStockProducts as $product)
-                    <div class="group p-6 rounded-[2.5rem] bg-slate-50/50 border border-slate-50 transition-all hover:bg-white hover:shadow-2xl hover:shadow-slate-200/50 hover:border-transparent">
-                        <div class="flex items-center gap-5 mb-5">
-                            <div class="h-14 w-14 flex items-center justify-center rounded-[1.5rem] bg-white shadow-sm transition-all group-hover:scale-110 group-hover:bg-rose-50">
-                                <i class="fas fa-exclamation-triangle text-rose-500"></i>
+                <div class="space-y-4">
+                    @forelse($topProducts as $product)
+                        <div
+                            class="flex items-center justify-between p-4 rounded-2xl bg-slate-50/50 border border-slate-50 transition-colors hover:bg-white hover:shadow-lg hover:shadow-slate-200/50">
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="h-10 w-10 flex items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 font-bold">
+                                    {{ $loop->iteration }}
+                                </div>
+                                <div>
+                                    <p class="text-sm font-black text-slate-900">{{ $product->name }}</p>
+                                    <span
+                                        class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ $product->category->name }}</span>
+                                </div>
                             </div>
-                            <div class="overflow-hidden">
-                                <p class="truncate text-base font-black text-slate-900 group-hover:text-indigo-600 transition-colors">{{ $product->name }}</p>
-                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ $product->category->name }}</span>
+                            <div class="text-right">
+                                <p class="text-sm font-black text-indigo-600">
+                                    {{ $settings['currency_symbol'] ?? '$' }}{{ number_format($product->total_revenue, 2) }}</p>
+                                <span
+                                    class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ number_format($product->stock_quantity) }}
+                                    in stock</span>
                             </div>
                         </div>
-                        <div class="space-y-2">
-                             <div class="relative h-2 w-full rounded-full bg-slate-200 overflow-hidden">
-                                <div class="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-rose-500 to-orange-400" style="width: {{ ($product->stock_quantity / max(1, $product->reorder_level)) * 100 }}%"></div>
-                             </div>
-                             <div class="flex justify-between text-[11px] font-bold">
-                                <span class="text-rose-500 uppercase">{{ $product->stock_quantity }} units left</span>
-                                <span class="text-slate-400">Target: {{ $product->reorder_level }}</span>
-                             </div>
-                        </div>
-                    </div>
                     @empty
-                    <div class="md:col-span-2 flex flex-col items-center justify-center py-20 text-slate-300">
-                        <div class="h-24 w-24 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-300 mb-6 text-4xl">
-                            <i class="fas fa-check-double"></i>
+                        <div class="py-12 text-center">
+                            <p class="text-sm font-bold text-slate-400 opacity-60">No sales data available</p>
                         </div>
-                        <p class="text-sm font-bold opacity-60">Your catalog is healthy. All SKU levels are within safety buffers.</p>
+                    @endforelse
+                </div>
+            </div>
+
+            <!-- Low Stock Alerts -->
+            <div class="rounded-4xl bg-white p-8 shadow-sm border border-slate-100">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h4 class="text-lg font-extrabold text-slate-900">Low Stock Alert</h4>
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+                            {{ $lowStockProducts->count() }} items</p>
                     </div>
+                    <a href="{{ route('products.index', ['filter' => 'low_stock']) }}"
+                        class="text-xs font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1">
+                        View All <i class="fas fa-arrow-right text-[10px]"></i>
+                    </a>
+                </div>
+
+                <div class="space-y-4">
+                    @forelse($lowStockProducts->take(5) as $product)
+                        <div class="p-4 rounded-2xl bg-rose-50 border border-rose-100 flex items-center gap-4">
+                            <div
+                                class="h-10 w-10 flex items-center justify-center rounded-xl bg-white text-rose-500 shadow-sm shrink-0">
+                                <i class="fas fa-triangle-exclamation"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-black text-slate-900">{{ $product->name }}</p>
+                                <p class="text-xs font-bold text-rose-600">Stock: {{ $product->stock_quantity }} <span
+                                        class="text-slate-400 opacity-60 mx-1">|</span> Min: {{ $product->reorder_level }}</p>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="py-12 text-center">
+                            <p class="text-sm font-bold text-slate-400 opacity-60">No low stock items</p>
+                        </div>
                     @endforelse
                 </div>
             </div>
         </div>
 
-        <!-- Terminal Feed -->
-        <div class="lg:col-span-4 flex">
-            <div class="flex-1 rounded-[3.5rem] bg-slate-900 p-10 text-white shadow-2xl relative overflow-hidden">
-                <div class="relative z-10 flex h-full flex-col">
-                    <div class="mb-10">
-                        <h2 class="text-2xl font-black tracking-tight">Recent Activity</h2>
-                        <div class="h-1 w-12 bg-indigo-500 mt-3 rounded-full"></div>
-                    </div>
-
-                    <div class="space-y-8 flex-1">
-                        @forelse($recentSales as $sale)
-                        <div class="group flex items-start gap-4">
-                            <div class="h-12 w-12 shrink-0 flex items-center justify-center rounded-2xl bg-white/5 text-indigo-400 border border-white/5 transition-all group-hover:bg-white/10">
-                                <i class="fas fa-barcode text-sm"></i>
-                            </div>
-                            <div class="flex-1 overflow-hidden border-b border-white/5 pb-6 group-last:border-0">
-                                <div class="flex items-center justify-between mb-1">
-                                    <p class="truncate text-sm font-bold text-slate-100">{{ $sale->customer->name ?? 'Walk-in' }}</p>
-                                    <span class="text-[10px] font-bold text-slate-500 whitespace-nowrap">{{ $sale->created_at->diffForHumans() }}</span>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <span class="text-xs font-black text-indigo-500">{{ $settings['currency_symbol'] ?? '$' }}{{ number_format($sale->grand_total, 2) }}</span>
-                                    <span class="h-1 w-1 rounded-full bg-slate-700"></span>
-                                    <span class="text-[10px] font-bold text-slate-600 uppercase tracking-widest">{{ $sale->payment_method }}</span>
-                                </div>
-                            </div>
-                        </div>
-                        @empty
-                        <div class="text-center py-20 opacity-30">
-                            <i class="fas fa-ghost text-5xl mb-4"></i>
-                            <p class="text-xs font-bold uppercase tracking-widest">Feed silent</p>
-                        </div>
-                        @endforelse
-                    </div>
-
-                    <a href="{{ route('reports.sales') }}" class="mt-8 flex items-center justify-center gap-4 rounded-3xl bg-white/5 py-5 text-[10px] font-black uppercase tracking-[0.3em] transition-all hover:bg-indigo-600 hover:shadow-xl hover:shadow-indigo-600/30">
-                        Detailed Ledger
-                        <i class="fas fa-external-link-alt text-[8px] opacity-40"></i>
-                    </a>
+        <!-- Quick Navigation Icons -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 pb-6">
+            <a href="{{ route('reports.sales') }}"
+                class="group flex flex-col items-center justify-center gap-4 p-8 rounded-[2.5rem] bg-indigo-600 text-white shadow-xl shadow-indigo-200 transition-all hover:scale-[1.03] active:scale-95">
+                <div
+                    class="h-16 w-16 flex items-center justify-center rounded-2xl bg-white/20 backdrop-blur-md transition-transform group-hover:rotate-12">
+                    <i class="fas fa-cart-shopping text-3xl"></i>
                 </div>
-                <i class="fas fa-radiation absolute -bottom-10 -right-10 text-9xl opacity-[0.03] rotate-12"></i>
-            </div>
+                <span class="text-lg font-extrabold tracking-tight">Sale</span>
+            </a>
+
+            <a href="{{ route('products.index') }}"
+                class="group flex flex-col items-center justify-center gap-4 p-8 rounded-[2.5rem] bg-blue-500 text-white shadow-xl shadow-blue-200 transition-all hover:scale-[1.03] active:scale-95">
+                <div
+                    class="h-16 w-16 flex items-center justify-center rounded-2xl bg-white/20 backdrop-blur-md transition-transform group-hover:rotate-12">
+                    <i class="fas fa-cube text-3xl"></i>
+                </div>
+                <span class="text-lg font-extrabold tracking-tight">Product</span>
+            </a>
+
+            <a href="{{ route('purchases.index') }}"
+                class="group flex flex-col items-center justify-center gap-4 p-8 rounded-[2.5rem] bg-emerald-500 text-white shadow-xl shadow-emerald-200 transition-all hover:scale-[1.03] active:scale-95">
+                <div
+                    class="h-16 w-16 flex items-center justify-center rounded-2xl bg-white/20 backdrop-blur-md transition-transform group-hover:rotate-12">
+                    <i class="fas fa-wave-square text-3xl"></i>
+                </div>
+                <span class="text-lg font-extrabold tracking-tight">Stock</span>
+            </a>
+
+            <a href="{{ route('reports.sales') }}"
+                class="group flex flex-col items-center justify-center gap-4 p-8 rounded-[2.5rem] bg-orange-600 text-white shadow-xl shadow-orange-200 transition-all hover:scale-[1.03] active:scale-95">
+                <div
+                    class="h-16 w-16 flex items-center justify-center rounded-2xl bg-white/20 backdrop-blur-md transition-transform group-hover:rotate-12">
+                    <i class="fas fa-chart-line text-3xl"></i>
+                </div>
+                <span class="text-lg font-extrabold tracking-tight">Reports</span>
+            </a>
         </div>
     </div>
-</div>
 @endsection
+
+@push('js')
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const chartConfig = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        display: true,
+                        color: 'rgba(235, 241, 250, 0.4)',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        font: { size: 10, weight: '600' },
+                        color: '#94a3b8'
+                    }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: {
+                        font: { size: 10, weight: '600' },
+                        color: '#94a3b8'
+                    }
+                }
+            }
+        };
+
+        // Revenue Trend Chart
+        const ctxRevenue = document.getElementById('revenueTrendChart').getContext('2d');
+        new Chart(ctxRevenue, {
+            type: 'line',
+            data: {
+                labels: @json($chartData['labels']),
+                datasets: [{
+                    label: 'Revenue',
+                    data: @json($chartData['revenue']),
+                    borderColor: '#6366f1',
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                    borderWidth: 4,
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#6366f1',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }]
+            },
+            options: chartConfig
+        });
+
+        // Sales Volume Chart
+        const ctxVolume = document.getElementById('salesVolumeChart').getContext('2d');
+        new Chart(ctxVolume, {
+            type: 'bar',
+            data: {
+                labels: @json($chartData['labels']),
+                datasets: [{
+                    label: 'Transactions',
+                    data: @json($chartData['volume']),
+                    backgroundColor: '#a855f7',
+                    borderRadius: 8,
+                    barThickness: 20
+                }]
+            },
+            options: chartConfig
+        });
+    </script>
+@endpush
