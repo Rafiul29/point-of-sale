@@ -48,6 +48,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/pos', [POSController::class, 'index'])->name('pos.index');
         Route::get('/pos/scan', [POSController::class, 'scanProduct'])->name('pos.scan');
         Route::get('/pos/search', [POSController::class, 'searchProduct'])->name('pos.search');
+        Route::get('/pos/search/customer', [POSController::class, 'searchCustomer'])->name('pos.customer.search');
         Route::post('/pos/store', [POSController::class, 'store'])->name('pos.store');
 
         // Customer Access

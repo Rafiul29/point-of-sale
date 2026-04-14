@@ -3,426 +3,748 @@
 @section('header', 'POS Workstation')
 
 @section('content')
-@php
-    $currency = $settings['currency_symbol'] ?? '$';
-    $tax_rate = ($settings['tax_percentage'] ?? 5);
-@endphp
+    @php
+        $currency = $settings['currency_symbol'] ?? '$';
+        $tax_rate = $settings['tax_percentage'] ?? 5;
+    @endphp
 
-<div class="grid grid-cols-1 gap-8 lg:grid-cols-12">
-    <!-- Left: Cart -->
-    <div class="lg:col-span-8">
-        <div class="flex flex-col rounded-[2rem] bg-white shadow-sm border border-slate-100 overflow-hidden min-h-[700px]">
-            <!-- Barcode Input Header -->
-            <div class="flex items-center gap-4 border-b border-slate-50 px-8 py-5">
-                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
-                    <i class="fas fa-barcode text-xl"></i>
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-12">
+        <!-- Left: Cart & Product Search -->
+        <div class="lg:col-span-8 space-y-3">
+            <div class="flex flex-col bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden min-h-[700px]">
+                <!-- Search & Actions Header -->
+                <div
+                    class="flex flex-col sm:flex-row items-center gap-3 border-b border-slate-100 px-6 py-4 bg-slate-50/50">
+                    <div class="relative flex-1 w-full group">
+                        <div
+                            class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <input type="text" id="product-search"
+                            class="w-full border border-slate-200 bg-white py-3 pl-11 pr-20 text-sm font-semibold rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 shadow-sm placeholder:text-slate-400 transition-all font-sans"
+                            placeholder="Search Name, Barcode, Category...">
+                        <div class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                            <span
+                                class="hidden sm:inline-block rounded-md bg-slate-100 px-2 py-1 text-[9px] font-bold text-slate-500 border border-slate-200 uppercase tracking-widest">Alt+P</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="relative flex-1 max-w-lg">
-                    <input type="text" id="barcode-input"
-                        class="w-full border-0 bg-slate-100 py-3.5 pl-5 pr-16 text-sm font-semibold rounded-2xl focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-400"
-                        placeholder="Scan barcode or enter SKU then press Enter..." autofocus>
-                    <span class="absolute right-4 top-1/2 -translate-y-1/2 rounded-lg bg-white px-2 py-1 text-[10px] font-bold text-slate-400 shadow-sm">Alt+S</span>
-                </div>
-            </div>
 
-            <!-- Cart Table -->
-            <div class="flex-1 overflow-y-auto">
-                <table class="w-full text-left">
-                    <thead class="sticky top-0 z-10 bg-white border-b border-slate-50">
-                        <tr>
-                            <th class="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">Item</th>
-                            <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">Price</th>
-                            <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">Qty</th>
-                            <th class="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">Total</th>
-                            <th class="px-8 py-4 text-right text-[10px] font-bold uppercase tracking-widest text-slate-400">Del</th>
-                        </tr>
-                    </thead>
-                    <tbody id="cart-items" class="divide-y divide-slate-50">
-                        <tr id="empty-cart-row">
-                            <td colspan="5" class="py-24 text-center text-slate-300">
-                                <i class="fas fa-shopping-basket text-5xl mb-4 opacity-20 block"></i>
-                                <p class="text-sm font-bold">Terminal ready — scan a product</p>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                <!-- Cart Table -->
+                <div class="flex-1 overflow-y-auto custom-scrollbar">
+                    <table class="w-full text-left border-separate border-spacing-0">
+                        <thead class="sticky top-0 z-10 bg-white/95 backdrop-blur-md">
+                            <tr class="bg-slate-50/50">
+                                <th
+                                    class="px-6 py-4 text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-100">
+                                    Product Detail</th>
+                                <th
+                                    class="px-4 py-4 text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-100">
+                                    Price</th>
+                                <th
+                                    class="px-4 py-4 text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-100 text-center">
+                                    Quantity</th>
+                                <th
+                                    class="px-4 py-4 text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-100">
+                                    Subtotal</th>
+                                <th
+                                    class="px-6 py-4 text-right text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-100">
+                                    Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cart-items" class="divide-y divide-slate-100">
+                            <tr id="empty-cart-row">
+                                <td colspan="5" class="py-32 text-center text-slate-300">
+                                    <div
+                                        class="bg-indigo-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <i class="fas fa-shopping-basket text-3xl text-indigo-200"></i>
+                                    </div>
+                                    <p class="text-base font-bold text-slate-400">Terminal Standby</p>
+                                    <p class="text-[11px] font-medium opacity-60 uppercase tracking-widest mt-1">Scan or
+                                        search products to begin</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Right: Summary Panel -->
-    <div class="lg:col-span-4">
-        <div class="space-y-6 sticky top-24">
-            <!-- Customer -->
-            <div class="rounded-[2rem] bg-white p-6 shadow-sm border border-slate-100">
-                <label class="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-3">Customer Profile</label>
-                <select id="customer-select" class="w-full border-0 bg-slate-100 py-3.5 px-4 text-sm font-semibold rounded-2xl focus:ring-2 focus:ring-indigo-500">
-                    <option value="">Walk-in Customer</option>
-                    @foreach($customers as $customer)
-                        <option value="{{ $customer->id }}">{{ $customer->name }}</option>
-                    @endforeach
-                </select>
+        <!-- Right: Summary & Customer -->
+        <div class="lg:col-span-4 space-y-4">
+            <!-- Customer Section -->
+            <div class="rounded-3xl bg-white p-6 shadow-xl border border-slate-200 space-y-5 relative overflow-hidden">
+                <div class="flex items-center justify-between relative z-10">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Customer Details</h3>
+                    <button type="button" id="search-customer-btn"
+                        class="h-8 px-3 rounded-lg bg-indigo-50 text-indigo-600 text-[10px] font-bold uppercase tracking-wider hover:bg-indigo-600 hover:text-white transition-all flex items-center gap-1.5 border border-indigo-100">
+                        <i class="fas fa-search-plus"></i> Search Registry
+                    </button>
+                </div>
+
+                <div id="selected-customer-display"
+                    class="bg-indigo-50 border border-indigo-100 rounded-2xl p-4 hidden relative z-10 fade-in">
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold text-lg shadow-md"
+                                id="customer-avatar-initial">W</div>
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-800 leading-none" id="display-customer-name">Walk-in
+                                    Customer</h4>
+                                <p class="text-[10px] text-indigo-500 font-bold uppercase tracking-wider mt-1.5"
+                                    id="display-customer-phone">Anonymous Member</p>
+                            </div>
+                        </div>
+                        <button type="button" id="clear-customer" class="text-slate-400 hover:text-rose-500 transition-all">
+                            <i class="fas fa-times-circle text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="customer-form" class="space-y-3 relative z-10">
+                    <div>
+                        <input type="text" id="customer-name"
+                            class="w-full border border-slate-200 bg-slate-50 py-3 px-4 text-xs font-semibold rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder:text-slate-400 transition-all"
+                            placeholder="Full Name *">
+                        <span id="customer-name-error"
+                            class="text-[10px] text-rose-500 font-bold hidden px-1 mt-1">Identitiy is required per node
+                            protocol.</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <input type="text" id="customer-phone"
+                            class="w-full border border-slate-200 bg-slate-50 py-3 px-4 text-xs font-semibold rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder:text-slate-400 transition-all"
+                            placeholder="Phone Index">
+                        <input type="email" id="customer-email"
+                            class="w-full border border-slate-200 bg-slate-50 py-3 px-4 text-xs font-semibold rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder:text-slate-400 transition-all"
+                            placeholder="Mail Node">
+                    </div>
+                    <textarea id="customer-address" rows="2"
+                        class="w-full border border-slate-200 bg-slate-50 py-3 px-4 text-xs font-semibold rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 placeholder:text-slate-400 resize-none transition-all"
+                        placeholder="Billing Geography"></textarea>
+                    <input type="hidden" id="customer-id" value="">
+                </div>
             </div>
 
-            <!-- Totals -->
-            <div class="rounded-[2.5rem] bg-slate-900 p-8 text-white shadow-xl relative overflow-hidden">
+            <!-- Totals & Checkout -->
+            <div
+                class="rounded-3xl bg-slate-800 p-6 text-white shadow-2xl relative overflow-hidden border border-slate-700">
                 <div class="relative z-10 space-y-4">
-                    <div class="flex justify-between items-center text-sm opacity-60">
-                        <span class="font-semibold">Subtotal</span>
-                        <span id="summary-subtotal" class="font-bold">{{ $currency }}0.00</span>
+                    <div
+                        class="flex justify-between items-center text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+                        <span>Terminal Subtotal</span>
+                        <span id="summary-subtotal" class="text-white">{{ $currency }}0.00</span>
                     </div>
-                    <div class="flex justify-between items-center text-sm text-indigo-400">
-                        <span class="font-semibold">Tax ({{ $tax_rate }}%)</span>
-                        <span id="summary-tax" class="font-bold">{{ $currency }}0.00</span>
+                    <div
+                        class="flex justify-between items-center text-[11px] font-bold text-indigo-300 uppercase tracking-widest">
+                        <span>Tax Contribution ({{ $tax_rate }}%)</span>
+                        <span id="summary-tax" class="text-indigo-200">{{ $currency }}0.00</span>
                     </div>
-                    <div class="border-t border-white/5 my-4"></div>
-                    <div class="flex justify-between items-end">
-                        <span class="text-xs font-bold opacity-40 uppercase tracking-widest">Total Payable</span>
-                        <span id="summary-total" class="text-4xl font-extrabold text-indigo-400 tracking-tighter">{{ $currency }}0.00</span>
+                    <div class="pt-4 border-t border-slate-700">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Aggregate Sum</span>
+                            <span id="summary-total"
+                                class="text-3xl font-black text-white tracking-tighter">{{ $currency }}0.00</span>
+                        </div>
                     </div>
                 </div>
 
                 <div class="mt-8 space-y-3 relative z-10">
                     <button type="button" id="finalize-btn"
-                        class="w-full rounded-[1.5rem] py-5 text-lg font-extrabold text-white flex items-center justify-center gap-3
-                               bg-gradient-to-r from-indigo-500 to-purple-600 shadow-2xl shadow-indigo-600/30
-                               transition-all opacity-40 cursor-not-allowed">
-                        <i class="fas fa-rocket mr-2 opacity-70"></i> Finalize Sale
+                        class="w-full rounded-2xl py-4 text-base font-bold text-white flex items-center justify-center gap-3
+                                                                                                                           bg-indigo-600 shadow-lg shadow-indigo-900/50 hover:bg-indigo-500 active:scale-[0.98] transition-all disabled:opacity-30 disabled:grayscale"
+                        disabled>
+                        <span>Finalize Settlement</span>
+                        <i class="fas fa-check-circle opacity-50"></i>
                     </button>
                     <button type="button" id="clear-cart-btn"
-                        class="w-full py-3 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-rose-400 flex items-center justify-center gap-2 transition-colors">
-                        <i class="fas fa-undo-alt"></i> Clear Workstation
+                        class="w-full py-2 text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-rose-400 flex items-center justify-center gap-2 transition-colors">
+                        <i class="fas fa-undo-alt text-xs"></i> Purge Terminal
                     </button>
                 </div>
-                <i class="fas fa-cash-register absolute -bottom-10 -right-10 text-[10rem] opacity-[0.03] rotate-12"></i>
+
+                <!-- Background decor -->
+                <div class="absolute -top-10 -left-10 w-40 h-40 bg-indigo-500/5 rounded-full blur-3xl"></div>
+                <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-indigo-500/5 rounded-full blur-3xl"></div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- ═════════════════════ MODAL ═════════════════════ -->
-<div id="finalizeModal" style="display:none;" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-md">
-    <div class="relative w-full max-w-4xl max-h-[90vh] overflow-hidden bg-white rounded-[3.5rem] shadow-2xl">
-        <div class="grid grid-cols-1 lg:grid-cols-2 h-full">
-            <!-- Left: Payment Options -->
-            <div class="p-12 overflow-y-auto">
-                <div class="flex justify-between items-start mb-10">
-                    <div>
-                        <h2 class="text-3xl font-black text-slate-900">Checkout</h2>
-                        <p class="text-sm font-medium text-slate-400 mt-1">Select payment and reconcile amount.</p>
+    <!-- ═════════════════════ PRODUCT SEARCH MODAL ═════════════════════ -->
+    <div id="product-search-modal" style="display:none;"
+        class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
+        <div
+            class="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden scale-in-center">
+            <div class="px-8 py-5 border-b border-slate-100 flex items-center justify-between bg-white">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-md">
+                        <i class="fas fa-cubes"></i>
                     </div>
-                    <button id="close-modal-btn" class="h-12 w-12 flex items-center justify-center rounded-2xl bg-slate-100 text-slate-400 hover:bg-rose-50 hover:text-rose-500 transition-colors">
-                        <i class="fas fa-times text-sm"></i>
-                    </button>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800 leading-none">Product Finder</h3>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1.5">Locate active nodes
+                            in repository</p>
+                    </div>
                 </div>
+                <button type="button"
+                    class="close-search-modal h-8 w-8 flex items-center justify-center rounded-lg bg-slate-50 text-slate-400 hover:bg-rose-50 hover:text-rose-500 transition-all">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
 
-                <div class="space-y-10">
-                    <!-- Payment Method -->
-                    <div>
-                        <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4 block">Settlement Channel</label>
-                        <div class="grid grid-cols-3 gap-4">
-                            <label class="cursor-pointer group">
-                                <input type="radio" name="payment_method" value="Cash" class="peer sr-only" checked>
-                                <div class="flex flex-col items-center gap-3 p-5 rounded-3xl border-2 border-slate-50 transition-all peer-checked:border-indigo-600 peer-checked:bg-indigo-50/50 text-slate-300 peer-checked:text-indigo-600 hover:border-slate-100 italic">
-                                    <i class="fas fa-wallet text-2xl"></i>
-                                    <span class="text-[10px] font-black uppercase tracking-widest">Cash</span>
-                                </div>
-                            </label>
-                            <label class="cursor-pointer group">
-                                <input type="radio" name="payment_method" value="Card" class="peer sr-only">
-                                <div class="flex flex-col items-center gap-3 p-5 rounded-3xl border-2 border-slate-50 transition-all peer-checked:border-indigo-600 peer-checked:bg-indigo-50/50 text-slate-300 peer-checked:text-indigo-600 hover:border-slate-100">
-                                    <i class="fas fa-credit-card text-2xl"></i>
-                                    <span class="text-[10px] font-black uppercase tracking-widest">Card</span>
-                                </div>
-                            </label>
-                            <label class="cursor-pointer group">
-                                <input type="radio" name="payment_method" value="Credit" class="peer sr-only">
-                                <div class="flex flex-col items-center gap-3 p-5 rounded-3xl border-2 border-slate-50 transition-all peer-checked:border-indigo-600 peer-checked:bg-indigo-50/50 text-slate-300 peer-checked:text-indigo-600 hover:border-slate-100">
-                                    <i class="fas fa-handshake text-2xl"></i>
-                                    <span class="text-[10px] font-black uppercase tracking-widest">Credit</span>
-                                </div>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Tender Tool -->
-                    <div class="space-y-4">
-                        <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Tendered Amount</label>
-                        <div class="relative">
-                            <span class="absolute left-6 top-1/2 -translate-y-1/2 text-2xl font-black text-slate-300">{{ $currency }}</span>
-                            <input type="number" id="paid_amount_input" step="0.01" min="0"
-                                class="w-full border-0 bg-slate-50 py-7 pl-14 pr-7 text-4xl font-black rounded-3xl focus:ring-4 focus:ring-indigo-600/5 placeholder:text-slate-200"
-                                value="0.00">
-                        </div>
-                        <div class="flex justify-between items-center p-6 rounded-3xl bg-slate-900 text-white shadow-xl shadow-slate-900/20">
-                            <span class="text-[10px] font-black uppercase tracking-widest opacity-40">Reconciliation</span>
-                            <span id="due-amount-display" class="text-2xl font-black text-emerald-400">{{ $currency }}0.00</span>
-                        </div>
-                    </div>
+            <div class="p-5 border-b border-slate-100">
+                <div class="relative group">
+                    <i
+                        class="fas fa-filter absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-500 transition-colors"></i>
+                    <input type="text" id="modal-product-input"
+                        class="w-full border border-slate-200 bg-slate-50 py-3 pl-11 pr-5 text-sm font-semibold rounded-xl focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500 transition-all"
+                        placeholder="Iterate through matches...">
                 </div>
             </div>
 
-            <!-- Right: Order Matrix -->
-            <div class="bg-indigo-600 p-12 text-white flex flex-col justify-between relative overflow-hidden">
-                <div class="relative z-10">
-                    <p class="text-[10px] font-black uppercase tracking-[0.3em] opacity-40 mb-8 italic">Order Matrix</p>
-                    <div id="modal-items-list" class="space-y-4 mb-10 max-h-64 overflow-y-auto pr-4 scroll-smooth"></div>
-                    
-                    <div class="space-y-4 border-t border-white/10 pt-8">
-                        <div class="flex justify-between text-xs font-bold opacity-60">
-                            <span>Net Subtotal</span>
-                            <span id="modal-subtotal-display">{{ $currency }}0.00</span>
-                        </div>
-                        <div class="flex justify-between text-xs font-bold text-indigo-200">
-                            <span>Computed Tax</span>
-                            <span id="modal-tax-display">{{ $currency }}0.00</span>
-                        </div>
-                        <div class="pt-6">
-                            <p class="text-[10px] font-black uppercase tracking-widest opacity-40 mb-2">Final Invoice Total</p>
-                            <h2 id="modal-total-display" class="text-6xl font-black tracking-tighter text-white">{{ $currency }}0.00</h2>
-                        </div>
-                    </div>
+            <div class="h-[400px] overflow-y-auto p-6 custom-scrollbar bg-slate-50/30">
+                <div id="product-results" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Results injected here -->
                 </div>
-
-                <div class="relative z-10 pt-10">
-                    <button id="confirm-sale-btn"
-                        class="w-full py-6 rounded-[2rem] text-xl font-black text-indigo-600 bg-white shadow-2xl transition-all hover:scale-[1.03] active:scale-[0.97] flex items-center justify-center gap-4">
-                        Commit Transaction
-                        <i class="fas fa-check-circle text-lg"></i>
-                    </button>
-                    <p class="text-center text-[10px] font-bold opacity-30 mt-6 uppercase tracking-widest">Verified by active node system</p>
-                </div>
-                
-                <i class="fas fa-shield-check absolute -bottom-10 -right-10 text-[15rem] opacity-5 -rotate-12 transition-transform duration-1000"></i>
             </div>
         </div>
     </div>
-</div>
-@endsection
 
-@push('js')
-<script>
-$(document).ready(function () {
-    let cart = [];
-    const TAX_RATE = {{ ($settings['tax_percentage'] ?? 5) / 100 }};
-    const CURRENCY = '{{ $currency }}';
+    <!-- ═════════════════════ CUSTOMER SEARCH MODAL ═════════════════════ -->
+    <div id="customer-search-modal" style="display:none;"
+        class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
+        <div
+            class="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden scale-in-center">
+            <div class="px-8 py-5 border-b border-slate-100 flex items-center justify-between bg-white">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-md">
+                        <i class="fas fa-users-viewfinder"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800 leading-none">Registry Lookup</h3>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1.5">Search identities in
+                            the master node</p>
+                    </div>
+                </div>
+                <button type="button"
+                    class="close-customer-modal h-8 w-8 flex items-center justify-center rounded-lg bg-slate-50 text-slate-400 hover:bg-rose-50 hover:text-rose-500 transition-all">
+                    <i class="fas fa-times text-sm"></i>
+                </button>
+            </div>
 
-    /* ──────────────── NETWORK ──────────────── */
-    $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' } });
+            <div class="p-5 border-b border-slate-100">
+                <div class="relative group">
+                    <i
+                        class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-emerald-500 transition-colors"></i>
+                    <input type="text" id="modal-customer-input"
+                        class="w-full border border-slate-200 bg-slate-50 py-3 pl-11 pr-5 text-sm font-semibold rounded-xl focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 transition-all"
+                        placeholder="Match name, phone, or mail index...">
+                </div>
+            </div>
 
-    /* ──────────────── INPUT LAYER ──────────────── */
-    $(document).on('keydown', function (e) {
-        if (e.altKey && e.which === 83) { $('#barcode-input').focus(); }
-    });
+            <div class="h-[300px] overflow-y-auto p-4 custom-scrollbar bg-slate-50/30">
+                <div id="customer-results" class="space-y-2">
+                    <!-- Results injected here -->
+                </div>
+            </div>
+        </div>
+    </div>
 
-    $('#barcode-input').on('keydown', function (e) {
-        if (e.which === 13) {
-            let val = $(this).val().trim();
-            if (val) { searchProduct(val); $(this).val(''); }
-        }
-    });
+    <!-- ═════════════════════ FINAL CHECKOUT MODAL ═════════════════════ -->
+    <div id="finalizeModal" style="display:none;"
+        class="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+        <div
+            class="relative w-full max-w-4xl max-h-[90vh] overflow-hidden bg-white rounded-3xl shadow-2xl border border-slate-200 scale-in-center">
+            <div class="flex flex-col h-full lg:flex-row">
+                <!-- Left: Settlement -->
+                <div class="p-8 flex-1 overflow-y-auto custom-scrollbar border-r border-slate-100">
+                    <div class="flex justify-between items-start mb-8">
+                        <div>
+                            <h2 class="text-3xl font-black text-slate-800 tracking-tight">Settlement</h2>
+                            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-1">Reconcile
+                                transaction protocol.</p>
+                        </div>
+                        <button id="close-finalize-btn"
+                            class="h-10 w-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-400 hover:text-rose-500 transition-all">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
 
-    function searchProduct(barcode) {
-        $.get('{{ route('pos.search') }}', { barcode: barcode }, function (res) {
-            if (res.success) { addToCart(res.product); } 
-            else { alert('SKU not recognized: ' + barcode); }
-        }).fail(function () { alert('Network error. Check node connection.'); });
-    }
-
-    /* ──────────────── CORE CART ──────────────── */
-    function addToCart(product) {
-        let existing = cart.find(i => i.id === product.id);
-        if (existing) { existing.quantity += 1; } 
-        else {
-            cart.push({ 
-                id: product.id, 
-                name: product.name, 
-                barcode: product.barcode, 
-                price: parseFloat(product.selling_price), 
-                quantity: 1 
-            });
-        }
-        renderCart();
-    }
-
-    function renderCart() {
-        let $tbody = $('#cart-items');
-        $tbody.empty();
-
-        if (cart.length === 0) {
-            $tbody.append('<tr id="empty-cart-row"><td colspan="5" class="py-24 text-center text-slate-300"><i class="fas fa-shopping-basket text-5xl mb-4 opacity-20 block"></i><p class="text-sm font-bold opacity-60 italic">Terminal ready — scan or enter SKU</p></td></tr>');
-            setFinalizeEnabled(false);
-            updateTotals(0);
-            return;
-        }
-
-        let subtotal = 0;
-        cart.forEach(function (item, index) {
-            let lineTotal = item.price * item.quantity;
-            subtotal += lineTotal;
-            $tbody.append(`
-                <tr class="group hover:bg-slate-50/50 transition-all border-b border-transparent hover:border-slate-100">
-                    <td class="px-8 py-6">
-                        <div class="flex items-center gap-5">
-                            <div class="h-12 w-12 flex items-center justify-center rounded-2xl bg-white shadow-sm border border-slate-50 text-indigo-500 shrink-0 group-hover:scale-110 transition-transform"><i class="fas fa-cube text-sm"></i></div>
-                            <div>
-                                <p class="text-sm font-black text-slate-900">${item.name}</p>
-                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">${item.barcode}</p>
+                    <div class="space-y-8">
+                        <div>
+                            <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-4 block">Payment
+                                Methodology</label>
+                            <div class="grid grid-cols-3 gap-3">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="payment_method" value="Cash" class="peer sr-only" checked>
+                                    <div
+                                        class="flex flex-col items-center gap-2 p-4 rounded-2xl border-2 border-slate-100 hover:border-indigo-100 transition-all peer-checked:border-indigo-600 peer-checked:bg-indigo-50 peer-checked:text-indigo-600 text-slate-400">
+                                        <i class="fas fa-money-bill-wave text-xl"></i>
+                                        <span class="text-[10px] font-bold uppercase tracking-wider">Cash Node</span>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="payment_method" value="Card" class="peer sr-only">
+                                    <div
+                                        class="flex flex-col items-center gap-2 p-4 rounded-2xl border-2 border-slate-100 hover:border-indigo-100 transition-all peer-checked:border-indigo-600 peer-checked:bg-indigo-50 peer-checked:text-indigo-600 text-slate-400">
+                                        <i class="fas fa-credit-card text-xl"></i>
+                                        <span class="text-[10px] font-bold uppercase tracking-wider">Card Node</span>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="payment_method" value="Credit" class="peer sr-only">
+                                    <div
+                                        class="flex flex-col items-center gap-2 p-4 rounded-2xl border-2 border-slate-100 hover:border-indigo-100 transition-all peer-checked:border-indigo-600 peer-checked:bg-indigo-50 peer-checked:text-indigo-600 text-slate-400">
+                                        <i class="fas fa-landmark text-xl"></i>
+                                        <span class="text-[10px] font-bold uppercase tracking-wider">Credit Node</span>
+                                    </div>
+                                </label>
                             </div>
                         </div>
-                    </td>
-                    <td class="px-6 py-6 text-sm font-bold text-slate-600">${CURRENCY}${item.price.toFixed(2)}</td>
-                    <td class="px-6 py-6">
-                        <div class="flex items-center gap-2 bg-slate-100 rounded-2xl px-3 py-1.5 w-fit border border-slate-200/50">
-                            <button class="h-8 w-8 flex items-center justify-center rounded-xl bg-white text-slate-400 hover:text-indigo-600 shadow-sm decrease-qty transition-all active:scale-90" data-index="${index}"><i class="fas fa-minus text-[10px]"></i></button>
-                            <span class="w-8 text-center text-xs font-black text-slate-900">${item.quantity}</span>
-                            <button class="h-8 w-8 flex items-center justify-center rounded-xl bg-white text-slate-400 hover:text-indigo-600 shadow-sm increase-qty transition-all active:scale-90" data-index="${index}"><i class="fas fa-plus text-[10px]"></i></button>
+
+                        <div class="space-y-4">
+                            <label class="text-[10px] font-bold uppercase tracking-widest text-slate-400 block">Settlement
+                                Value</label>
+                            <div class="relative">
+                                <span
+                                    class="absolute left-6 top-1/2 -translate-y-1/2 text-2xl font-black text-slate-300 group-focus-within:text-indigo-600 transition-colors">{{ $currency }}</span>
+                                <input type="number" id="paid_amount_input" step="0.01" min="0"
+                                    class="w-full border-2 border-slate-100 bg-slate-50 py-2 pl-8 pr-2 text-2xl font-black rounded-xl focus:border-indigo-600 focus:bg-white transition-all text-slate-800 tracking-tighter"
+                                    value="0.00">
+                            </div>
+
+                            <div
+                                class="bg-slate-900 rounded-3xl p-6 text-white overflow-hidden shadow-xl border border-slate-700">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <p class="text-[9px] font-bold uppercase tracking-widest text-slate-500">Node
+                                            Balance</p>
+                                        <h3 id="due-amount-header"
+                                            class="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                                            Reconciliation</h3>
+                                    </div>
+                                    <span id="due-amount-display"
+                                        class="text-xl font-black text-emerald-400 tracking-tighter">{{ $currency }}0.00</span>
+                                </div>
+                            </div>
                         </div>
-                    </td>
-                    <td class="px-6 py-6 text-sm font-black text-indigo-600">${CURRENCY}${lineTotal.toFixed(2)}</td>
-                    <td class="px-8 py-6 text-right">
-                        <button class="h-10 w-10 flex items-center justify-center rounded-xl text-slate-200 hover:text-rose-500 hover:bg-rose-50 transition-all remove-item" data-index="${index}"><i class="fas fa-trash-alt text-xs"></i></button>
-                    </td>
-                </tr>
-            `);
-        });
+                    </div>
+                </div>
 
-        updateTotals(subtotal);
-        setFinalizeEnabled(true);
-    }
+                <!-- Right: Summary Sidebar -->
+                <div class="bg-indigo-500 p-8 text-white w-full lg:w-[350px] flex flex-col justify-between">
+                    <div>
+                        <div
+                            class="flex items-center gap-2 mb-8 bg-white/10 w-fit px-4 py-1.5 rounded-full border border-white/10">
+                            <span class="text-[9px] font-bold uppercase tracking-widest">Active Node Summary</span>
+                        </div>
 
-    function updateTotals(subtotal) {
-        let tax = subtotal * TAX_RATE;
-        let grand = subtotal + tax;
-        $('#summary-subtotal').text(CURRENCY + subtotal.toFixed(2));
-        $('#summary-tax').text(CURRENCY + tax.toFixed(2));
-        $('#summary-total').text(CURRENCY + grand.toFixed(2));
-    }
+                        <div id="modal-items-list"
+                            class="space-y-3 mb-8 max-h-[250px] overflow-y-auto pr-2 custom-scrollbar">
+                            <!-- Items injected -->
+                        </div>
 
-    function setFinalizeEnabled(enabled) {
-        let $btn = $('#finalize-btn');
-        if (enabled) {
-            $btn.removeClass('opacity-40 cursor-not-allowed').addClass('hover:scale-[1.02] active:scale-[0.98] cursor-pointer shadow-indigo-500/40');
-        } else {
-            $btn.addClass('opacity-40 cursor-not-allowed').removeClass('hover:scale-[1.02] active:scale-[0.98] cursor-pointer shadow-indigo-500/40');
+                        <div class="space-y-3 border-t border-white/10 pt-6">
+                            <div
+                                class="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest opacity-60">
+                                <span>Subtotal</span>
+                                <span id="modal-subtotal-display">{{ $currency }}0.00</span>
+                            </div>
+                            <div
+                                class="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest opacity-60">
+                                <span>Tax Index</span>
+                                <span id="modal-tax-display">{{ $currency }}0.00</span>
+                            </div>
+                            <div class="pt-4 border-t border-white/10">
+                                <p class="text-[9px] font-bold uppercase tracking-widest opacity-40 mb-1">Settlement Sum</p>
+                                <h1 id="modal-total-display" class="text-5xl font-black tracking-tighter text-white">
+                                    {{ $currency }}0.00
+                                </h1>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-8">
+                        <button id="confirm-sale-btn"
+                            class="w-full py-5 rounded-2xl text-xl font-bold text-indigo-600 bg-white shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
+                            <span>Execute Committal</span>
+                            <i class="fas fa-print opacity-30"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+
+@push('css')
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
         }
-        $btn.data('enabled', enabled);
-    }
 
-    /* ──────────────── EVENTS ──────────────── */
-    $(document).on('click', '.increase-qty', function () {
-        let i = $(this).data('index'); cart[i].quantity += 1; renderCart();
-    });
-
-    $(document).on('click', '.decrease-qty', function () {
-        let i = $(this).data('index');
-        if (cart[i].quantity > 1) { cart[i].quantity -= 1; renderCart(); }
-    });
-
-    $(document).on('click', '.remove-item', function () {
-        if(confirm('Purge this line item?')) { cart.splice($(this).data('index'), 1); renderCart(); }
-    });
-
-    $('#clear-cart-btn').on('click', function () {
-        if (confirm('Verify: Purge entire workstation session?')) { cart = []; renderCart(); }
-    });
-
-    /* ──────────────── MODAL ENGINE ──────────────── */
-    function openModal() {
-        let subtotal = 0;
-        cart.forEach(i => subtotal += i.price * i.quantity);
-        let tax = subtotal * TAX_RATE;
-        let grand = subtotal + tax;
-
-        let itemsHtml = cart.map(i =>
-            `<div class="flex justify-between items-center group"><div class="flex flex-col"><span class="text-xs font-black text-white group-hover:text-indigo-200 transition-colors">${i.name}</span><span class="text-[10px] font-bold text-white/40 italic">×${i.quantity} units</span></div><span class="font-black text-sm text-white">${CURRENCY}${(i.price * i.quantity).toFixed(2)}</span></div>`
-        ).join('');
-        $('#modal-items-list').html(itemsHtml);
-
-        $('#modal-subtotal-display').text(CURRENCY + subtotal.toFixed(2));
-        $('#modal-tax-display').text(CURRENCY + tax.toFixed(2));
-        $('#modal-total-display').text(CURRENCY + grand.toFixed(2));
-        $('#paid_amount_input').val(grand.toFixed(2)).trigger('input');
-
-        $('#finalizeModal').fadeIn(300);
-        setTimeout(() => $('#paid_amount_input').focus().select(), 100);
-    }
-
-    function closeModal() { $('#finalizeModal').fadeOut(200); }
-
-    $('#finalize-btn').on('click', function () {
-        if (!$(this).data('enabled')) return;
-        if (cart.length === 0) return;
-        openModal();
-    });
-
-    $('#close-modal-btn').on('click', closeModal);
-    $('#finalizeModal').on('click', function (e) { if ($(e.target).is('#finalizeModal')) closeModal(); });
-
-    /* ──────────────── TENDER RECONCILIATION ──────────────── */
-    $('#paid_amount_input').on('input', function () {
-        let totalStr = $('#modal-total-display').text().replace(CURRENCY, '').replace(/,/g, '');
-        let total = parseFloat(totalStr) || 0;
-        let paid = parseFloat($(this).val()) || 0;
-        let reconciliation = paid - total;
-        
-        let $display = $('#due-amount-display');
-        if (reconciliation >= 0) {
-            $display.text(CURRENCY + reconciliation.toFixed(2) + ' change').removeClass('text-rose-400').addClass('text-emerald-400');
-        } else {
-            $display.text(CURRENCY + Math.abs(reconciliation).toFixed(2) + ' owed').removeClass('text-emerald-400').addClass('text-rose-400');
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.02);
         }
-    });
 
-    /* ──────────────── COMMIT ──────────────── */
-    $('#confirm-sale-btn').on('click', function () {
-        let $btn = $(this);
-        let subtotal = 0; cart.forEach(i => subtotal += i.price * i.quantity);
-        let tax = subtotal * TAX_RATE;
-        let grand = subtotal + tax;
-        let paid = parseFloat($('#paid_amount_input').val()) || 0;
-        let due = Math.max(0, grand - paid);
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(79, 70, 229, 0.2);
+            border-radius: 10px;
+        }
 
-        let payload = {
-            customer_id: $('#customer-select').val() || null,
-            total_amount: parseFloat(subtotal.toFixed(2)),
-            tax_amount: parseFloat(tax.toFixed(2)),
-            grand_total: parseFloat(grand.toFixed(2)),
-            paid_amount: parseFloat(paid.toFixed(2)),
-            due_amount: parseFloat(due.toFixed(2)),
-            payment_method: $('input[name="payment_method"]:checked').val() || 'Cash',
-            items: cart.map(item => ({
-                product_id: item.id,
-                quantity: item.quantity,
-                unit_price: parseFloat(item.price.toFixed(2)),
-                subtotal: parseFloat((item.price * item.quantity).toFixed(2))
-            }))
-        };
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(79, 70, 229, 0.4);
+        }
 
-        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-3"></i> Synchronizing Node...');
+        .scale-in-center {
+            animation: scale-in-center 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+        }
 
-        $.ajax({
-            url: '{{ route('pos.store') }}',
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(payload),
-            success: function (res) {
-                if (res.success) {
-                    cart = []; renderCart(); closeModal();
-                    window.location.href = '{{ url('/invoice') }}/' + res.sale_id;
-                } else {
-                    alert('Node Error: ' + res.message);
-                    $btn.prop('disabled', false).text('Commit Transaction');
-                }
-            },
-            error: function (xhr) {
-                let msg = 'Terminal failure.';
-                try { msg = JSON.parse(xhr.responseText).message || xhr.responseText; } catch(e){}
-                alert('CRITICAL ERROR [' + xhr.status + ']: ' + msg);
-                $btn.prop('disabled', false).text('Commit Transaction');
+        @keyframes scale-in-center {
+            0% {
+                transform: scale(0.97);
+                opacity: 0;
             }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .fade-in {
+            animation: fade-in 0.3s ease-out forwards;
+        }
+
+        @keyframes fade-in {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .product-card:hover {
+            transform: translateY(-2px);
+            transition: all 0.2s ease;
+        }
+
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+@endpush
+
+@push('js')
+    <script>
+        $(document).ready(function () {
+            let cart = [];
+            let selectedCustomer = null;
+            const TAX_RATE = {{ ($settings['tax_percentage'] ?? 5) / 100 }};
+            const CURRENCY = '{{ $currency }}';
+
+            $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' } });
+
+            /* ──────────────── PRODUCTS ──────────────── */
+            let searchTimer;
+            $('#product-search').on('keyup', function (e) {
+                let query = $(this).val().trim();
+                if (e.which === 13 && query) {
+                    performProductSearch(query);
+                } else {
+                    clearTimeout(searchTimer);
+                    if (query.length >= 2) {
+                        searchTimer = setTimeout(() => performProductSearch(query), 300);
+                    }
+                }
+            });
+
+            $(document).on('keydown', function (e) {
+                if (e.altKey && e.which === 80) { e.preventDefault(); $('#product-search').focus(); }
+            });
+
+            function performProductSearch(query) {
+                $.get('{{ route('pos.search') }}', { query: query }, function (res) {
+                    if (res.success && res.products.length > 0) {
+                        if (res.products.length === 1 && (res.products[0].barcode === query || res.products[0].name.toLowerCase() === query.toLowerCase())) {
+                            addToCart(res.products[0]);
+                            $('#product-search').val('');
+                        } else {
+                            renderProductResults(res.products);
+                            $('#product-search-modal').fadeIn(150);
+                            $('#modal-product-input').val(query).focus();
+                        }
+                    }
+                });
+            }
+
+            function renderProductResults(products) {
+                let html = '';
+                products.forEach(p => {
+                    let catName = p.category ? p.category.name : 'Unknown Node';
+                    let isOut = p.stock_quantity <= 0;
+                    html += `
+                                                                                                    <div class="product-card bg-white border border-slate-200 p-4 rounded-2xl cursor-pointer group shadow-sm hover:border-indigo-500 hover:shadow-lg transition-all ${isOut ? 'opacity-40 grayscale pointer-events-none' : ''}" data-product='${JSON.stringify(p).replace(/'/g, "&apos;")}'>
+                                                                                                        <div class="flex items-center gap-4">
+                                                                                                            <div class="w-14 h-14 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center overflow-hidden shrink-0 group-hover:bg-white transition-colors">
+                                                                                                                ${p.image ? `<img src="/storage/${p.image}" class="w-full h-full object-cover">` : '<i class="fas fa-cube text-slate-300"></i>'}
+                                                                                                            </div>
+                                                                                                            <div class="flex-1 min-w-0">
+                                                                                                                <h4 class="text-xs font-bold text-slate-800 truncate">${p.name}</h4>
+                                                                                                                <p class="text-[9px] font-bold text-indigo-500 uppercase tracking-wider mt-1">${catName}</p>
+                                                                                                                <div class="flex justify-between items-baseline mt-2">
+                                                                                                                    <span class="text-sm font-black text-slate-900">${CURRENCY}${parseFloat(p.selling_price).toFixed(2)}</span>
+                                                                                                                    <span class="text-[9px] font-bold px-2 py-0.5 rounded-full ${p.stock_quantity < 10 ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600'}">Node Qty: ${p.stock_quantity}</span>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                `;
+                });
+                $('#product-results').html(html);
+            }
+
+            $(document).on('click', '.product-card', function () {
+                let product = $(this).data('product');
+                addToCart(product);
+                $('#product-search-modal').fadeOut(100);
+                $('#product-search').val('').focus();
+            });
+
+            $('#modal-product-input').on('keyup', function () {
+                let q = $(this).val().toLowerCase();
+                $('.product-card').each(function () {
+                    let text = $(this).text().toLowerCase();
+                    $(this).toggle(text.includes(q));
+                });
+            });
+
+            $('.close-search-modal').on('click', () => $('#product-search-modal').fadeOut(100));
+
+            /* ──────────────── CUSTOMERS ──────────────── */
+            $('#search-customer-btn').on('click', function () {
+                $('#customer-search-modal').fadeIn(150);
+                $('#modal-customer-input').focus();
+            });
+
+            $('.close-customer-modal').on('click', () => $('#customer-search-modal').fadeOut(100));
+
+            $('#modal-customer-input').on('keyup', function () {
+                let query = $(this).val().trim();
+                if (query.length >= 2) {
+                    $.get('{{ route('pos.customer.search') }}', { query: query }, function (res) {
+                        if (res.success) renderCustomerResults(res.customers);
+                    });
+                }
+            });
+
+            function renderCustomerResults(customers) {
+                let html = '';
+                if (customers.length === 0) {
+                    html = '<div class="text-center py-8"><p class="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Registry Empty</p></div>';
+                } else {
+                    customers.forEach(c => {
+                        html += `
+                                                                                                        <div class="select-customer-row flex items-center justify-between p-3 rounded-xl bg-white border border-slate-100 hover:bg-slate-50 hover:border-indigo-200 transition-all cursor-pointer group" data-customer='${JSON.stringify(c).replace(/'/g, "&apos;")}'>
+                                                                                                            <div class="flex items-center gap-3">
+                                                                                                                <div class="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">${c.name.charAt(0)}</div>
+                                                                                                                <div class="min-w-0">
+                                                                                                                    <h4 class="text-xs font-bold text-slate-800 truncate">${c.name}</h4>
+                                                                                                                    <p class="text-[9px] text-slate-400 font-bold mt-0.5">${c.phone || 'No Phone Node'} • ${c.email || 'No Mail Node'}</p>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                            <i class="fas fa-arrow-right-long text-slate-200 group-hover:text-emerald-500 transition-all text-xs"></i>
+                                                                                                        </div>
+                                                                                                    `;
+                    });
+                }
+                $('#customer-results').html(html);
+            }
+
+            $(document).on('click', '.select-customer-row', function () {
+                let customer = $(this).data('customer');
+                selectCustomer(customer);
+                $('#customer-search-modal').fadeOut(100);
+            });
+
+            function selectCustomer(c) {
+                selectedCustomer = c;
+                $('#customer-id').val(c.id);
+                $('#customer-name').val(c.name).removeClass('border-rose-300');
+                $('#customer-phone').val(c.phone || '');
+                $('#customer-email').val(c.email || '');
+                $('#customer-address').val(c.address || '');
+                $('#display-customer-name').text(c.name);
+                $('#display-customer-phone').text(c.phone || 'Anonymous Registry');
+                $('#customer-avatar-initial').text(c.name.charAt(0));
+                $('#selected-customer-display').removeClass('hidden');
+                $('#customer-form').hide();
+                $('#customer-name-error').addClass('hidden');
+            }
+
+            $('#clear-customer').on('click', function () {
+                selectedCustomer = null;
+                $('#customer-id').val(''); $('#customer-name').val(''); $('#customer-phone').val(''); $('#customer-email').val(''); $('#customer-address').val('');
+                $('#selected-customer-display').addClass('hidden'); $('#customer-form').show();
+            });
+
+            /* ──────────────── CART ENGINE ──────────────── */
+            function addToCart(product) {
+                let existing = cart.find(i => i.id === product.id);
+                if (existing) {
+                    if (existing.quantity + 1 > product.stock_quantity) {
+                        Swal.fire({ icon: 'warning', text: `Node capacity exceeded. Max units available: [${product.stock_quantity}]`, background: '#f8fafc', color: '#0f172a', confirmButtonColor: '#4f46e5' });
+                        return;
+                    }
+                    existing.quantity += 1;
+                } else {
+                    if (product.stock_quantity < 1) {
+                        Swal.fire({ icon: 'error', text: 'Node depleted. Resource currently unavailable.', background: '#f8fafc', color: '#0f172a', confirmButtonColor: '#4f46e5' });
+                        return;
+                    }
+                    cart.push({ id: product.id, name: product.name, barcode: product.barcode, price: parseFloat(product.selling_price), stock: product.stock_quantity, quantity: 1 });
+                }
+                renderCart();
+            }
+
+            function renderCart() {
+                let $tbody = $('#cart-items');
+                $tbody.empty();
+                if (cart.length === 0) {
+                    $tbody.append($('#empty-cart-row').prop('outerHTML'));
+                    updateTotals(0); $('#finalize-btn').attr('disabled', true); return;
+                }
+                let subtotal = 0;
+                cart.forEach(function (item, index) {
+                    let lineTotal = item.price * item.quantity; subtotal += lineTotal;
+                    $tbody.append(`
+                                                                                                    <tr class="hover:bg-slate-50/50 transition-all">
+                                                                                                        <td class="px-6 py-4">
+                                                                                                            <div class="flex items-center gap-4">
+                                                                                                                <div class="h-10 w-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-400 shrink-0 border border-slate-100"><i class="fas fa-cube text-xs"></i></div>
+                                                                                                                <div class="min-w-0"><p class="text-xs font-bold text-slate-800 leading-none truncate">${item.name}</p><p class="text-[9px] font-bold text-slate-400 mt-1.5 uppercase tracking-widest">${item.barcode}</p></div>
+                                                                                                            </div>
+                                                                                                        </td>
+                                                                                                        <td class="px-4 py-4 text-xs font-bold text-slate-600">${CURRENCY}${item.price.toFixed(2)}</td>
+                                                                                                        <td class="px-4 py-4 text-center">
+                                                                                                            <div class="flex items-center justify-center gap-2 bg-white border border-slate-200 rounded-xl p-1 w-fit mx-auto shadow-sm">
+                                                                                                                <button class="h-7 w-7 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-400 hover:text-indigo-600 transition-all decrease-qty" data-index="${index}"><i class="fas fa-minus text-[8px]"></i></button>
+                                                                                                                <span class="w-6 text-center text-xs font-bold text-slate-800">${item.quantity}</span>
+                                                                                                                <button class="h-7 w-7 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-400 hover:text-indigo-600 transition-all increase-qty" data-index="${index}"><i class="fas fa-plus text-[8px]"></i></button>
+                                                                                                            </div>
+                                                                                                        </td>
+                                                                                                        <td class="px-4 py-4 text-xs font-black text-indigo-600">${CURRENCY}${lineTotal.toFixed(2)}</td>
+                                                                                                        <td class="px-6 py-4 text-right"><button class="h-9 w-9 flex items-center justify-center rounded-lg text-slate-300 hover:text-rose-500 hover:bg-rose-50 transition-all remove-item" data-index="${index}"><i class="fas fa-trash-can text-xs"></i></button></td>
+                                                                                                    </tr>
+                                                                                                `);
+                });
+                updateTotals(subtotal); $('#finalize-btn').attr('disabled', false);
+            }
+
+            function updateTotals(subtotal) {
+                let tax = subtotal * TAX_RATE; let grand = subtotal + tax;
+                $('#summary-subtotal').text(CURRENCY + subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 }));
+                $('#summary-tax').text(CURRENCY + tax.toLocaleString(undefined, { minimumFractionDigits: 2 }));
+                $('#summary-total').text(CURRENCY + grand.toLocaleString(undefined, { minimumFractionDigits: 2 }));
+            }
+
+            $(document).on('click', '.increase-qty', function () {
+                let i = $(this).data('index');
+                if (cart[i].quantity + 1 > cart[i].stock) {
+                    Swal.fire({ icon: 'warning', text: 'Node resource limit reached.', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
+                    return;
+                }
+                cart[i].quantity += 1; renderCart();
+            });
+
+            $(document).on('click', '.decrease-qty', function () {
+                let i = $(this).data('index'); if (cart[i].quantity > 1) { cart[i].quantity -= 1; renderCart(); }
+            });
+
+            $(document).on('click', '.remove-item', function () {
+                let idx = $(this).data('index');
+                Swal.fire({ title: 'Purge Node?', text: "Detach this resource from active stream?", icon: 'question', showCancelButton: true, confirmButtonColor: '#4f46e5', cancelButtonColor: '#f43f5e', confirmButtonText: 'Yes, Detach', background: '#f8fafc' }).then((r) => { if (r.isConfirmed) { cart.splice(idx, 1); renderCart(); } });
+            });
+
+            $('#clear-cart-btn').on('click', function () {
+                Swal.fire({ title: 'Wipe Session?', text: "Reset all terminal nodes to standby?", icon: 'warning', showCancelButton: true, confirmButtonColor: '#f43f5e', confirmButtonText: 'Purge All', background: '#f8fafc' }).then((r) => { if (r.isConfirmed) { cart = []; renderCart(); } });
+            });
+
+            /* ──────────────── SETTLEMENT ──────────────── */
+            function openFinalizeModal() {
+                // Validation before opening modal
+                let c_id = $('#customer-id').val();
+                let c_name = $('#customer-name').val();
+
+                if (!c_id && !c_name) {
+                    $('#customer-name').addClass('border-rose-400 bg-rose-50').focus();
+                    $('#customer-name-error').removeClass('hidden');
+                    return;
+                } else {
+                    $('#customer-name').removeClass('border-rose-400 bg-rose-50');
+                    $('#customer-name-error').addClass('hidden');
+                }
+
+                let subtotal = 0; cart.forEach(i => subtotal += i.price * i.quantity);
+                let tax = subtotal * TAX_RATE; let grand = subtotal + tax;
+
+                $('#modal-items-list').html(cart.map(i => `
+                                                                                                <div class="flex justify-between items-center bg-white/5 p-3 rounded-xl border border-white/5">
+                                                                                                    <div class="min-w-0"><span class="text-[11px] font-bold text-white leading-none block truncate">${i.name}</span><span class="text-[9px] font-bold text-indigo-200 uppercase mt-1 opacity-60">Vol: ${i.quantity}</span></div>
+                                                                                                    <span class="font-bold text-sm text-white">${CURRENCY}${(i.price * i.quantity).toFixed(2)}</span>
+                                                                                                </div>
+                                                                                            `).join(''));
+
+                $('#modal-subtotal-display').text(CURRENCY + subtotal.toFixed(2));
+                $('#modal-tax-display').text(CURRENCY + tax.toFixed(2));
+                $('#modal-total-display').text(CURRENCY + grand.toFixed(2));
+                $('#paid_amount_input').val(grand.toFixed(2)).trigger('input');
+                $('#finalizeModal').fadeIn(200);
+                setTimeout(() => $('#paid_amount_input').focus().select(), 100);
+            }
+
+            $('#finalize-btn').on('click', openFinalizeModal);
+            $('#close-finalize-btn').on('click', () => $('#finalizeModal').fadeOut(150));
+
+            $('#paid_amount_input').on('input', function () {
+                let total = parseFloat($('#modal-total-display').text().replace(CURRENCY, '').replace(/,/g, '')) || 0;
+                let paid = parseFloat($(this).val()) || 0; let diff = paid - total;
+                let $display = $('#due-amount-display'); let $header = $('#due-amount-header');
+                if (diff >= 0) { $display.text(CURRENCY + diff.toFixed(2)).removeClass('text-rose-400').addClass('text-emerald-400'); $header.text('Refund Change').removeClass('text-rose-400'); }
+                else { $display.text(CURRENCY + Math.abs(diff).toFixed(2)).removeClass('text-emerald-400').addClass('text-rose-400'); $header.text('Owed Ledger').addClass('text-rose-400'); }
+            });
+
+            $('#confirm-sale-btn').on('click', function () {
+                let $btn = $(this);
+                let subtotal = 0; cart.forEach(i => subtotal += i.price * i.quantity);
+                let tax = subtotal * TAX_RATE; let grand = subtotal + tax;
+                let paid = parseFloat($('#paid_amount_input').val()) || 0;
+                let due = Math.max(0, grand - paid);
+                let customerData = { id: $('#customer-id').val(), name: $('#customer-name').val(), phone: $('#customer-phone').val(), email: $('#customer-email').val(), address: $('#customer-address').val() };
+
+                let payload = { customer_data: customerData, total_amount: subtotal, tax_amount: tax, grand_total: grand, paid_amount: paid, due_amount: due, payment_method: $('input[name="payment_method"]:checked').val(), items: cart.map(i => ({ product_id: i.id, quantity: i.quantity, unit_price: i.price, subtotal: i.price * i.quantity })) };
+
+                $btn.prop('disabled', true).html('<i class="fas fa-circle-notch fa-spin mr-3"></i> Syncing Node...');
+                $.ajax({
+                    url: '{{ route('pos.store') }}', method: 'POST', contentType: 'application/json', data: JSON.stringify(payload),
+                    success: function (res) {
+                        if (res.success) {
+                            Swal.fire({ icon: 'success', title: 'Sale Executed', text: 'Committal successful. Routing to invoice matrix...', showConfirmButton: false, timer: 1200, background: '#f8fafc' });
+                            setTimeout(() => window.location.href = '{{ url('/invoice') }}/' + res.sale_id, 1200);
+                        } else {
+                            Swal.fire({ icon: 'error', title: 'Sync Error', text: res.message, background: '#f8fafc' }); $btn.prop('disabled', false).text('Execute Committal');
+                        }
+                    },
+                    error: function (xhr) {
+                        let msg = 'System failure during committal.'; try { msg = JSON.parse(xhr.responseText).message || msg; } catch (e) { }
+                        Swal.fire({ icon: 'error', title: 'Fatal Node Error', text: msg, background: '#f8fafc' }); $btn.prop('disabled', false).text('Execute Committal');
+                    }
+                });
+            });
         });
-    });
-});
-</script>
+    </script>
 @endpush
