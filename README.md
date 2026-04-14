@@ -212,3 +212,28 @@ This section confirms how each of your specific requirements is addressed in the
 | **Barcode scanner** | `PRODUCTS.barcode` field; JavaScript global listener for keyboard-wedge scanners. |
 | **Barcode labels PDF**| `BarcodeService` to generate standard labels from product list to PDF. |
 | **Excel Import/Export**| `Maatwebsite/Excel` for both importing and exporting `Product` and `Stock` records. |
+
+
+
+
+Changes
+1. Doller sing change to bdt taka hole project 
+2. admin don't acess pos page
+3. cachier when sell product customtomer informatin get name,email,phone,address
+4. categories subcategory needed (pic optional)
+5. product model image filed use
+6. /suppliers pages use bangladeshi frienly text use 
+7. create and update product image field  and category and subcategory id added
+8. /products page stock and stock sync option exclude total sku change (total Product)
+9. purchases/create page stock update  status wise (Pending, Received, Cancelled)
+10. /reports/sales page  word use friendly text
+11. /reports/inventory page filter use start and end date  
+12. dashboard header fixed navbar use  
+13. /audit-logs page filter option model App%5CModels%5CProduc opion exlcude
+
+
+Cachier Dashboard chnages
+1. terminal pos search product search name category sku barcode
+2. terminal pos sell product  customer search (name phone email address)
+
+demeshounajahan@gmail.com

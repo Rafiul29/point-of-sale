@@ -105,7 +105,8 @@
             opacity: 0;
             transition: opacity 0.4s ease;
             backdrop-filter: blur(4px);
-            background-color: rgba(15, 23, 42, 0.5); /* slate-900 with opacity */
+            background-color: rgba(15, 23, 42, 0.5);
+            /* slate-900 with opacity */
         }
 
         .mobile-backdrop.show {
@@ -122,7 +123,8 @@
             }
 
             .main-content {
-                margin-left: 18rem; /* Default margin to prevent shift */
+                margin-left: 18rem;
+                /* Default margin to prevent shift */
             }
 
             .main-content.sidebar-open {
@@ -136,13 +138,13 @@
             .sidebar.collapsed {
                 transform: translateX(0);
             }
-            
+
             .sidebar.collapsed:hover {
                 width: 18rem;
                 z-index: 60;
                 box-shadow: 20px 0 25px -5px rgba(0, 0, 0, 0.2);
             }
-            
+
             .sidebar.collapsed:hover .sidebar-text {
                 opacity: 1;
                 visibility: visible;
@@ -150,22 +152,22 @@
                 width: auto;
                 margin-left: 0.75rem;
             }
-            
+
             .sidebar.collapsed:hover .sidebar-icon {
                 margin-right: 0.75rem;
                 width: auto;
             }
-            
+
             .sidebar.collapsed:hover .sidebar-category-label {
                 display: block;
             }
-            
+
             .sidebar.collapsed:hover nav a {
                 justify-content: flex-start;
                 padding-left: 1rem;
                 padding-right: 1rem;
             }
-            
+
             .sidebar.collapsed:hover nav li {
                 padding: 0;
             }
@@ -202,17 +204,19 @@
         .custom-scrollbar::-webkit-scrollbar {
             width: 4px;
         }
+
         .custom-scrollbar::-webkit-scrollbar-track {
             background: transparent;
         }
+
         .custom-scrollbar::-webkit-scrollbar-thumb {
             background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
         }
+
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: rgba(255, 255, 255, 0.2);
         }
-
     </style>
     @stack('css')
 </head>
@@ -221,16 +225,16 @@
 
     <div class="flex min-h-screen">
         <!-- Mobile backdrop -->
-        <div id="mobile-backdrop" class="mobile-backdrop fixed inset-0 z-30 lg:hidden"
-            onclick="closeSidebar()"></div>
+        <div id="mobile-backdrop" class="mobile-backdrop fixed inset-0 z-30 lg:hidden" onclick="closeSidebar()"></div>
 
         <div class="print:hidden">
             @include('layouts.sidebar')
         </div>
 
-        <div id="main-content" class="main-content flex flex-1 flex-col transition-all duration-400 print:ml-0 overflow-x-hidden">
+        <div id="main-content"
+            class="main-content flex flex-1 flex-col transition-all duration-400 print:ml-0 overflow-x-hidden">
             <header
-                class="sticky top-0 z-30 flex h-16 shrink-0 items-center justify-between border-b border-slate-200 bg-white/70 px-4 sm:px-6 lg:px-8 backdrop-blur-xl print:hidden">
+                class="fixed w-full top-0 z-30 flex h-16 shrink-0 items-center justify-between border-b border-slate-200 bg-white/70 px-4 sm:px-6 lg:px-8 backdrop-blur-xl print:hidden">
                 <!-- Left Section: Toggle & Title -->
                 <div class="flex items-center gap-4">
                     <!-- Mobile menu button -->
@@ -253,19 +257,23 @@
                 <!-- Right Section: User & Actions -->
                 <div class="flex items-center gap-3 sm:gap-6">
                     <div class="hidden sm:flex flex-col items-end">
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1">Authenticated As</span>
-                        <span class="text-xs font-extrabold text-indigo-600">{{ auth()->user()->role ?? 'Admin' }}</span>
+                        <span
+                            class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1">Authenticated
+                            As</span>
+                        <span
+                            class="text-xs font-extrabold text-indigo-600">{{ auth()->user()->role ?? 'Admin' }}</span>
                     </div>
-                    
+
                     <div class="h-8 w-px bg-slate-200 hidden sm:block"></div>
 
-                    <a href="{{ route('settings.index') }}" class="p-2 rounded-xl text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all">
+                    <a href="{{ route('settings.index') }}"
+                        class="p-2 rounded-xl text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-all">
                         <i class="fas fa-cog text-lg"></i>
                     </a>
                 </div>
             </header>
 
-            <main class="flex-1 p-4 sm:p-6 lg:p-10">
+            <main class="flex-1 p-4 sm:p-6 lg:p-10 mt-10">
                 @if (session('success'))
                     <div
                         class="mb-6 rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-emerald-800 shadow-sm animate-in fade-in slide-in-from-top-4 duration-300">
@@ -383,7 +391,7 @@
         }
 
         // Handle window resize
-        window.addEventListener('resize', function() {
+        window.addEventListener('resize', function () {
             const wasMobile = window.innerWidth < 1024;
             setTimeout(() => {
                 const isMobile = window.innerWidth < 1024;
@@ -398,7 +406,7 @@
         });
 
         // Close sidebar when clicking navigation links on mobile
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             const link = e.target.closest('a[href]');
             if (link && window.innerWidth < 1024 && sidebarOpen) {
                 const href = link.getAttribute('href');
@@ -409,7 +417,7 @@
         });
 
         // Toggle sidebar when clicking on sidebar area (desktop only)
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             const sidebar = document.getElementById('sidebar');
             const desktopBtn = document.getElementById('desktop-toggle-btn');
 

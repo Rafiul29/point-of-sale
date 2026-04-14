@@ -19,13 +19,16 @@ class ReportController extends Controller
         $startDate = $request->start_date ? Carbon::parse($request->start_date) : Carbon::now()->startOfMonth();
         $endDate   = $request->end_date   ? Carbon::parse($request->end_date)   : Carbon::now()->endOfMonth();
 
+        $start = $startDate->copy()->startOfDay();
+        $end   = $endDate->copy()->endOfDay();
+
         $query = Sale::with('customer')
-            ->whereBetween('created_at', [$startDate->copy()->startOfDay(), $endDate->copy()->endOfDay()]);
+            ->whereBetween('created_at', [$start, $end]);
 
         $stats = [
             'total_revenue' => (clone $query)->sum('grand_total'),
             'total_tax'     => (clone $query)->sum('tax_amount'),
-            'total_profit'  => $this->calculateProfit($startDate, $endDate),
+            'total_profit'  => $this->calculateProfit($start, $end),
             'sales_count'   => (clone $query)->count(),
         ];
 
@@ -50,13 +53,11 @@ class ReportController extends Controller
         return view('reports.inventory', compact('products'));
     }
 
-
     public function salesByPeriod(Request $request)
     {
         $period = $request->get('period', 'daily');
 
         if ($period === 'weekly') {
-
             $from = Carbon::now()->subWeeks(11)->startOfWeek();
             $to   = Carbon::now()->endOfWeek();
 
@@ -75,7 +76,6 @@ class ReportController extends Controller
                     return $r;
                 });
         } else {
-
             $from = Carbon::now()->subDays(29)->startOfDay();
             $to   = Carbon::now()->endOfDay();
 
@@ -101,12 +101,10 @@ class ReportController extends Controller
             'sales_count' => $rows->sum('sales_count'),
         ];
 
-
         $todayStats = [
             'revenue'     => Sale::whereDate('created_at', today())->sum('grand_total'),
             'sales_count' => Sale::whereDate('created_at', today())->count(),
         ];
-
 
         $weekStats = [
             'revenue'     => Sale::whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->sum('grand_total'),
@@ -115,7 +113,6 @@ class ReportController extends Controller
 
         return view('reports.daily-weekly', compact('rows', 'totals', 'period', 'todayStats', 'weekStats'));
     }
-
 
     public function topProducts(Request $request)
     {
@@ -156,7 +153,6 @@ class ReportController extends Controller
         ));
     }
 
-
     public function lowStockAlert()
     {
         $lowStockProducts = Product::lowStock()
@@ -170,22 +166,13 @@ class ReportController extends Controller
         return view('reports.low-stock', compact('lowStockProducts', 'outOfStock', 'critical'));
     }
 
-
     private function calculateProfit($start, $end)
     {
-        $saleItems = DB::table('sale_items')
+        return DB::table('sale_items')
             ->join('sales', 'sales.id', '=', 'sale_items.sale_id')
-            ->whereBetween('sales.created_at', [$start->copy()->startOfDay(), $end->copy()->endOfDay()])
-            ->select('sale_items.quantity', 'sale_items.unit_price', 'sale_items.product_id')
-            ->get();
-
-        $profit = 0;
-        foreach ($saleItems as $item) {
-            $product   = Product::find($item->product_id);
-            $costPrice = $product ? $product->purchase_price : 0;
-            $profit   += ($item->unit_price - $costPrice) * $item->quantity;
-        }
-
-        return $profit;
+            ->join('products', 'products.id', '=', 'sale_items.product_id')
+            ->whereBetween('sales.created_at', [$start, $end])
+            ->selectRaw('SUM((sale_items.unit_price - products.purchase_price) * sale_items.quantity) as total_profit')
+            ->value('total_profit') ?? 0;
     }
 }

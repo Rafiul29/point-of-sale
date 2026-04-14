@@ -10,11 +10,37 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products   = Product::with(['category', 'supplier'])->latest()->get();
-        $categories = Category::all();
+        $query = Product::with(['category', 'subcategory', 'supplier'])->latest();
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('barcode', 'like', "%{$search}%")
+                  ->orWhereHas('category', function($q2) use ($search) {
+                      $q2->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+
+        if ($request->filled('min_price')) {
+            $query->where('selling_price', '>=', $request->min_price);
+        }
+
+        if ($request->filled('max_price')) {
+            $query->where('selling_price', '<=', $request->max_price);
+        }
+
+        $products   = $query->paginate(10)->withQueryString();
+        $categories = Category::whereNull('parent_id')->with('subcategories')->get();
         $suppliers  = Supplier::all();
+        
         return view('products.index', compact('products', 'categories', 'suppliers'));
     }
 
@@ -24,14 +50,22 @@ class ProductController extends Controller
             'name'           => 'required|string|max:255',
             'barcode'        => 'required|string|unique:products',
             'category_id'    => 'required|exists:categories,id',
+            'subcategory_id' => 'nullable|exists:categories,id',
             'supplier_id'    => 'required|exists:suppliers,id',
             'purchase_price' => 'required|numeric|min:0',
             'selling_price'  => 'required|numeric|min:0',
             'stock_quantity' => 'required|integer|min:0',
             'reorder_level'  => 'required|integer|min:0',
+            'image'          => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $product = Product::create($request->all());
+        $data = $request->all();
+
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('products', 'public');
+        }
+
+        $product = Product::create($data);
 
         AuditLogService::log('product_created', $product, [], $product->only([
             'name', 'barcode', 'purchase_price', 'selling_price', 'stock_quantity', 'reorder_level',
@@ -46,16 +80,26 @@ class ProductController extends Controller
             'name'           => 'required|string|max:255',
             'barcode'        => 'required|string|unique:products,barcode,' . $product->id,
             'category_id'    => 'required|exists:categories,id',
+            'subcategory_id' => 'nullable|exists:categories,id',
             'supplier_id'    => 'required|exists:suppliers,id',
             'purchase_price' => 'required|numeric|min:0',
             'selling_price'  => 'required|numeric|min:0',
             'stock_quantity' => 'required|integer|min:0',
             'reorder_level'  => 'required|integer|min:0',
+            'image'          => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $oldValues = $product->only(['name', 'purchase_price', 'selling_price', 'stock_quantity', 'reorder_level']);
+        $data = $request->all();
 
-        $product->update($request->all());
+        if ($request->hasFile('image')) {
+            if ($product->image && \Storage::disk('public')->exists($product->image)) {
+                \Storage::disk('public')->delete($product->image);
+            }
+            $data['image'] = $request->file('image')->store('products', 'public');
+        }
+
+        $product->update($data);
 
         $newValues = $product->fresh()->only(['name', 'purchase_price', 'selling_price', 'stock_quantity', 'reorder_level']);
 

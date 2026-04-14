@@ -387,7 +387,6 @@
 
             <div class="hidden md:flex items-center gap-3">
                 @if (!auth()->check())
-                    <a href="{{ route('login') }}" class="nav-link px-4 py-2">Log in</a>
                     <a href="{{ route('login') }}" class="btn-primary" style="padding:.6rem 1.3rem;font-size:.85rem">
                         <i class="fas fa-rocket" style="font-size:.8rem"></i>
                         Get Started

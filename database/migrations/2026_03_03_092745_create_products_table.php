@@ -15,7 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('barcode')->unique();
+            $table->string('image')->nullable();
             $table->foreignId('category_id')->constrained()->onDelete('cascade');
+            $table->foreignId('subcategory_id')->nullable()->constrained('categories')->onDelete('set null');
             $table->foreignId('supplier_id')->nullable()->constrained()->onDelete('set null');
             $table->decimal('purchase_price', 15, 2);
             $table->decimal('selling_price', 15, 2);

@@ -9,18 +9,38 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        $categories = Category::withCount('products')->latest()->get();
-        return view('categories.index', compact('categories'));
+        $categories = Category::with(['subcategories' => function($query) {
+                $query->withCount('products')->latest();
+            }])
+            ->withCount('products')
+            ->whereNull('parent_id')
+            ->latest()
+            ->paginate(10);
+            
+        $parentCategories = Category::whereNull('parent_id')->latest()->get();
+        
+        return view('categories.index', compact('categories', 'parentCategories'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255|unique:categories',
-            'description' => 'nullable|string'
+            'parent_id' => 'nullable|exists:categories,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'description' => 'nullable|string',
+            'status' => 'nullable|boolean'
         ]);
 
-        Category::create($request->all());
+        $data = $request->all();
+        $data['slug'] = str($request->name)->slug();
+        $data['status'] = $request->has('status');
+
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('categories', 'public');
+        }
+
+        Category::create($data);
 
         return redirect()->route('categories.index')->with('success', 'Category created successfully.');
     }
@@ -29,10 +49,25 @@ class CategoryController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255|unique:categories,name,' . $category->id,
-            'description' => 'nullable|string'
+            'parent_id' => 'nullable|exists:categories,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'description' => 'nullable|string',
+            'status' => 'nullable|boolean'
         ]);
 
-        $category->update($request->all());
+        $data = $request->all();
+        $data['slug'] = str($request->name)->slug();
+        $data['status'] = $request->has('status');
+
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($category->image && \Storage::disk('public')->exists($category->image)) {
+                \Storage::disk('public')->delete($category->image);
+            }
+            $data['image'] = $request->file('image')->store('categories', 'public');
+        }
+
+        $category->update($data);
 
         return redirect()->route('categories.index')->with('success', 'Category updated successfully.');
     }
@@ -41,6 +76,14 @@ class CategoryController extends Controller
     {
         if ($category->products()->count() > 0) {
             return redirect()->route('categories.index')->with('error', 'Cannot delete category with associated products.');
+        }
+
+        if ($category->subcategories()->count() > 0) {
+            return redirect()->route('categories.index')->with('error', 'Cannot delete category that has subcategories.');
+        }
+
+        if ($category->image && \Storage::disk('public')->exists($category->image)) {
+            \Storage::disk('public')->delete($category->image);
         }
 
         $category->delete();

@@ -25,7 +25,7 @@ class CustomerController extends Controller
             'balance' => 'nullable|numeric|min:0',
         ]);
 
-        $requestData = $request->only(['name','email','phone','address','balance']);
+        $requestData = $request->only(['name', 'email', 'phone', 'address', 'balance']);
         $requestData['balance'] = $requestData['balance'] ?? 0;
 
         Customer::create($requestData);
@@ -43,7 +43,7 @@ class CustomerController extends Controller
             'balance' => 'nullable|numeric|min:0',
         ]);
 
-        $requestData = $request->only(['name','email','phone','address','balance']);
+        $requestData = $request->only(['name', 'email', 'phone', 'address', 'balance']);
         $requestData['balance'] = $requestData['balance'] ?? 0;
 
         $customer->update($requestData);

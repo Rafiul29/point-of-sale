@@ -35,7 +35,9 @@ class DatabaseSeeder extends Seeder
         // Category
         $category = Category::create([
             'name' => 'Electronics',
+            'slug' => 'electronics',
             'description' => 'Electronic items and gadgets',
+            'status' => true,
         ]);
 
         // Supplier
@@ -55,11 +57,16 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Keyboard', 'barcode' => 'PROD005', 'purchase_price' => 30, 'selling_price' => 50, 'stock_quantity' => 80, 'reorder_level' => 10],
         ];
 
-        foreach ($products as $productData) {
-            Product::create(array_merge($productData, [
-                'category_id' => $category->id,
-                'supplier_id' => $supplier->id,
-            ]));
-        }
+
+
+        $this->call(CategorySeeder::class);
+        $this->call(ProductSeeder::class);
+
+        // foreach ($products as $productData) {
+        //     Product::create(array_merge($productData, [
+        //         'category_id' => $category->id,
+        //         'supplier_id' => $supplier->id,
+        //     ]));
+        // }
     }
 }

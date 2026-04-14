@@ -18,10 +18,13 @@ use App\Models\Setting;
 use Illuminate\Support\Facades\Route;
 
 // Landing Page
-Route::get('/', function () {
-    $settings = Setting::pluck('value', 'key');
-    return view('landing', compact('settings'));
-})->name('landing');
+// Route::get('/', function () {
+//     $settings = Setting::pluck('value', 'key');
+//     return view('landing', compact('settings'));
+// })->name('landing');
+
+Route::get('/', [LoginController::class, 'showLoginForm'])->name('login');
+Route::post('/', [LoginController::class, 'login']);
 
 // Auth Routes
 Route::middleware('guest')->group(function () {
@@ -40,13 +43,13 @@ Route::middleware('auth')->group(function () {
     // ── Cashier & Admin Routes (Operation Layer) ──
     Route::middleware('role:Cashier,Admin')->group(function () {
         Route::get('/cashier/dashboard', [CashierDashboardController::class, 'index'])->name('cashier.dashboard');
-        
+
         // POS Engine
         Route::get('/pos', [POSController::class, 'index'])->name('pos.index');
         Route::get('/pos/scan', [POSController::class, 'scanProduct'])->name('pos.scan');
         Route::get('/pos/search', [POSController::class, 'searchProduct'])->name('pos.search');
         Route::post('/pos/store', [POSController::class, 'store'])->name('pos.store');
-        
+
         // Customer Access
         Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
         Route::get('/customers/{customer}', [CustomerController::class, 'show'])->name('customers.show');
@@ -62,6 +65,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/products/import', [\App\Http\Controllers\ProductActionController::class, 'importProducts'])->name('products.import');
         Route::post('/stock/import', [\App\Http\Controllers\ProductActionController::class, 'importStock'])->name('stock.import');
         Route::get('/products/barcodes/print', [\App\Http\Controllers\ProductActionController::class, 'generateBarcodes'])->name('products.barcodes.print');
+
         Route::resource('products', ProductController::class);
 
         // Inventory
@@ -73,12 +77,12 @@ Route::middleware('auth')->group(function () {
         Route::resource('customers', CustomerController::class)->except(['index', 'show']);
 
         // Reports
-        Route::get('/reports/sales',         [ReportController::class, 'salesSummary'])->name('reports.sales');
-        Route::get('/reports/sales/export',  [ReportController::class, 'exportSales'])->name('reports.sales.export');
-        Route::get('/reports/inventory',     [ReportController::class, 'inventoryReport'])->name('reports.inventory');
-       
-        Route::get('/reports/top-products',  [ReportController::class, 'topProducts'])->name('reports.top-products');
-      
+        Route::get('/reports/sales', [ReportController::class, 'salesSummary'])->name('reports.sales');
+        Route::get('/reports/sales/export', [ReportController::class, 'exportSales'])->name('reports.sales.export');
+        Route::get('/reports/inventory', [ReportController::class, 'inventoryReport'])->name('reports.inventory');
+
+        Route::get('/reports/top-products', [ReportController::class, 'topProducts'])->name('reports.top-products');
+
 
         // Audit Log
         Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
