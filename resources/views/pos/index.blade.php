@@ -151,7 +151,7 @@
                 <div class="mt-8 space-y-3 relative z-10">
                     <button type="button" id="finalize-btn"
                         class="w-full rounded-2xl py-4 text-base font-bold text-white flex items-center justify-center gap-3
-                                                                                                                           bg-indigo-600 shadow-lg shadow-indigo-900/50 hover:bg-indigo-500 active:scale-[0.98] transition-all disabled:opacity-30 disabled:grayscale"
+                                                                                   bg-indigo-600 shadow-lg shadow-indigo-900/50 hover:bg-indigo-500 active:scale-[0.98] transition-all disabled:opacity-30 disabled:grayscale"
                         disabled>
                         <span>Finalize Settlement</span>
                         <i class="fas fa-check-circle opacity-50"></i>
@@ -197,13 +197,15 @@
                         class="fas fa-filter absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-500 transition-colors"></i>
                     <input type="text" id="modal-product-input"
                         class="w-full border border-slate-200 bg-slate-50 py-3 pl-11 pr-5 text-sm font-semibold rounded-xl focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-500 transition-all"
-                        placeholder="Iterate through matches...">
+                        placeholder="Search by name or barcode...">
                 </div>
             </div>
 
             <div class="h-[400px] overflow-y-auto p-6 custom-scrollbar bg-slate-50/30">
-                <div id="product-results" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div id="product-results" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-center">
                     <!-- Results injected here -->
+                    <div class="col-span-full py-12 text-slate-300 font-bold uppercase tracking-widest text-[10px]">Ready
+                        for node input</div>
                 </div>
             </div>
         </div>
@@ -308,7 +310,7 @@
                                 <span
                                     class="absolute left-6 top-1/2 -translate-y-1/2 text-2xl font-black text-slate-300 group-focus-within:text-indigo-600 transition-colors">{{ $currency }}</span>
                                 <input type="number" id="paid_amount_input" step="0.01" min="0"
-                                    class="w-full border-2 border-slate-100 bg-slate-50 py-2 pl-8 pr-2 text-2xl font-black rounded-xl focus:border-indigo-600 focus:bg-white transition-all text-slate-800 tracking-tighter"
+                                    class="w-full border-2 border-slate-100 bg-slate-50 py-4 px-8 text-4xl font-black rounded-3xl focus:border-indigo-600 focus:bg-white transition-all text-slate-800 tracking-tighter"
                                     value="0.00">
                             </div>
 
@@ -323,7 +325,7 @@
                                             Reconciliation</h3>
                                     </div>
                                     <span id="due-amount-display"
-                                        class="text-xl font-black text-emerald-400 tracking-tighter">{{ $currency }}0.00</span>
+                                        class="text-3xl font-black text-emerald-400 tracking-tighter">{{ $currency }}0.00</span>
                                 </div>
                             </div>
                         </div>
@@ -331,7 +333,7 @@
                 </div>
 
                 <!-- Right: Summary Sidebar -->
-                <div class="bg-indigo-500 p-8 text-white w-full lg:w-[350px] flex flex-col justify-between">
+                <div class="bg-indigo-600 p-8 text-white w-full lg:w-[350px] flex flex-col justify-between">
                     <div>
                         <div
                             class="flex items-center gap-2 mb-8 bg-white/10 w-fit px-4 py-1.5 rounded-full border border-white/10">
@@ -446,38 +448,57 @@
             let selectedCustomer = null;
             const TAX_RATE = {{ ($settings['tax_percentage'] ?? 5) / 100 }};
             const CURRENCY = '{{ $currency }}';
+            let searchTimer;
 
             $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' } });
 
-            /* ──────────────── PRODUCTS ──────────────── */
-            let searchTimer;
+            /* ──────────────── PRODUCT SEARCH ENGINE ──────────────── */
             $('#product-search').on('keyup', function (e) {
                 let query = $(this).val().trim();
                 if (e.which === 13 && query) {
-                    performProductSearch(query);
+                    performProductSearch(query, true);
                 } else {
                     clearTimeout(searchTimer);
                     if (query.length >= 2) {
-                        searchTimer = setTimeout(() => performProductSearch(query), 300);
+                        searchTimer = setTimeout(() => performProductSearch(query, true), 200);
                     }
                 }
             });
 
-            $(document).on('keydown', function (e) {
-                if (e.altKey && e.which === 80) { e.preventDefault(); $('#product-search').focus(); }
+            $('#product-search').on('click', function () {
+                let query = $(this).val().trim();
+                $('#product-search-modal').fadeIn(150);
+                $('#modal-product-input').val(query).focus();
+                if (query.length >= 2) performProductSearch(query, false);
             });
 
-            function performProductSearch(query) {
+            $('#modal-product-input').on('keyup', function (e) {
+                let query = $(this).val().trim();
+                clearTimeout(searchTimer);
+                if (query.length >= 2) {
+                    searchTimer = setTimeout(() => performProductSearch(query, false), 200);
+                } else if (query.length === 0) {
+                    $('#product-results').html('<div class="col-span-full py-12 text-slate-300 font-bold uppercase tracking-widest text-[10px]">Ready for node input</div>');
+                }
+            });
+
+            function performProductSearch(query, triggerModal) {
                 $.get('{{ route('pos.search') }}', { query: query }, function (res) {
                     if (res.success && res.products.length > 0) {
                         if (res.products.length === 1 && (res.products[0].barcode === query || res.products[0].name.toLowerCase() === query.toLowerCase())) {
                             addToCart(res.products[0]);
                             $('#product-search').val('');
+                            $('#modal-product-input').val('');
+                            $('#product-search-modal').fadeOut(100);
                         } else {
                             renderProductResults(res.products);
-                            $('#product-search-modal').fadeIn(150);
-                            $('#modal-product-input').val(query).focus();
+                            if (triggerModal) {
+                                $('#product-search-modal').fadeIn(150);
+                                $('#modal-product-input').val(query).focus();
+                            }
                         }
+                    } else {
+                        $('#product-results').html('<div class="col-span-full py-12 text-center text-slate-400 font-bold uppercase tracking-widest text-xs">No matching resource found</div>');
                     }
                 });
             }
@@ -488,22 +509,24 @@
                     let catName = p.category ? p.category.name : 'Unknown Node';
                     let isOut = p.stock_quantity <= 0;
                     html += `
-                                                                                                    <div class="product-card bg-white border border-slate-200 p-4 rounded-2xl cursor-pointer group shadow-sm hover:border-indigo-500 hover:shadow-lg transition-all ${isOut ? 'opacity-40 grayscale pointer-events-none' : ''}" data-product='${JSON.stringify(p).replace(/'/g, "&apos;")}'>
-                                                                                                        <div class="flex items-center gap-4">
-                                                                                                            <div class="w-14 h-14 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center overflow-hidden shrink-0 group-hover:bg-white transition-colors">
-                                                                                                                ${p.image ? `<img src="/storage/${p.image}" class="w-full h-full object-cover">` : '<i class="fas fa-cube text-slate-300"></i>'}
-                                                                                                            </div>
-                                                                                                            <div class="flex-1 min-w-0">
-                                                                                                                <h4 class="text-xs font-bold text-slate-800 truncate">${p.name}</h4>
-                                                                                                                <p class="text-[9px] font-bold text-indigo-500 uppercase tracking-wider mt-1">${catName}</p>
-                                                                                                                <div class="flex justify-between items-baseline mt-2">
-                                                                                                                    <span class="text-sm font-black text-slate-900">${CURRENCY}${parseFloat(p.selling_price).toFixed(2)}</span>
-                                                                                                                    <span class="text-[9px] font-bold px-2 py-0.5 rounded-full ${p.stock_quantity < 10 ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600'}">Node Qty: ${p.stock_quantity}</span>
-                                                                                                                </div>
-                                                                                                            </div>
-                                                                                                        </div>
-                                                                                                    </div>
-                                                                                                `;
+                                                            <div class="product-card bg-white border border-slate-200 p-4 rounded-xl cursor-pointer group shadow-sm hover:border-indigo-500 hover:shadow-lg transition-all ${isOut ? 'opacity-40 grayscale pointer-events-none' : ''}" data-product='${JSON.stringify(p).replace(/'/g, "&apos;")}'>
+                                                                <div class="flex  gap-4">
+                                                                    <div class="w-14 h-14 rounded-xl bg-slate-50 border border-slate-100 flex items-center overflow-hidden shrink-0 group-hover:bg-white transition-colors">
+                                                                        ${p.image ? `<img src="/storage/${p.image}" class="w-full h-full object-cover">` : '<i class="fas fa-cube text-slate-300"></i>'}
+                                                                    </div>
+                                                                    <div class="flex-1 min-w-0">
+                                                                    <div class="flex justify-between items-center"  > 
+                                                                        <h4 class="text-xs font-bold text-slate-800 truncate">${p.name}</h4>
+                                                                        <p class="text-[9px] font-bold text-indigo-500 uppercase tracking-wider mt-1">${catName}</p>
+                                                                    </div>
+                                                                        <div class="flex justify-between items-baseline mt-2">
+                                                                            <span class="text-sm font-black text-slate-900">${CURRENCY}${parseFloat(p.selling_price).toFixed(2)}</span>
+                                                                            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full ${p.stock_quantity < 10 ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600'}">Qty: ${p.stock_quantity}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        `;
                 });
                 $('#product-results').html(html);
             }
@@ -515,22 +538,10 @@
                 $('#product-search').val('').focus();
             });
 
-            $('#modal-product-input').on('keyup', function () {
-                let q = $(this).val().toLowerCase();
-                $('.product-card').each(function () {
-                    let text = $(this).text().toLowerCase();
-                    $(this).toggle(text.includes(q));
-                });
-            });
-
             $('.close-search-modal').on('click', () => $('#product-search-modal').fadeOut(100));
 
             /* ──────────────── CUSTOMERS ──────────────── */
-            $('#search-customer-btn').on('click', function () {
-                $('#customer-search-modal').fadeIn(150);
-                $('#modal-customer-input').focus();
-            });
-
+            $('#search-customer-btn').on('click', () => $('#customer-search-modal').fadeIn(150).find('input').focus());
             $('.close-customer-modal').on('click', () => $('#customer-search-modal').fadeOut(100));
 
             $('#modal-customer-input').on('keyup', function () {
@@ -543,38 +554,33 @@
             });
 
             function renderCustomerResults(customers) {
-                let html = '';
-                if (customers.length === 0) {
-                    html = '<div class="text-center py-8"><p class="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Registry Empty</p></div>';
-                } else {
-                    customers.forEach(c => {
-                        html += `
-                                                                                                        <div class="select-customer-row flex items-center justify-between p-3 rounded-xl bg-white border border-slate-100 hover:bg-slate-50 hover:border-indigo-200 transition-all cursor-pointer group" data-customer='${JSON.stringify(c).replace(/'/g, "&apos;")}'>
-                                                                                                            <div class="flex items-center gap-3">
-                                                                                                                <div class="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">${c.name.charAt(0)}</div>
-                                                                                                                <div class="min-w-0">
-                                                                                                                    <h4 class="text-xs font-bold text-slate-800 truncate">${c.name}</h4>
-                                                                                                                    <p class="text-[9px] text-slate-400 font-bold mt-0.5">${c.phone || 'No Phone Node'} • ${c.email || 'No Mail Node'}</p>
-                                                                                                                </div>
-                                                                                                            </div>
-                                                                                                            <i class="fas fa-arrow-right-long text-slate-200 group-hover:text-emerald-500 transition-all text-xs"></i>
-                                                                                                        </div>
-                                                                                                    `;
-                    });
-                }
+                let html = customers.length === 0 ? '<div class="text-center py-8 text-slate-400 font-bold uppercase tracking-widest text-[10px]">Registry Empty</div>' : '';
+                customers.forEach(c => {
+                    html += `
+                                                            <div class="select-customer-row flex items-center justify-between p-3 rounded-xl bg-white border border-slate-100 hover:bg-slate-50 hover:border-indigo-200 transition-all cursor-pointer group" data-customer='${JSON.stringify(c).replace(/'/g, "&apos;")}'>
+                                                                <div class="flex items-center gap-3">
+                                                                    <div class="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">${c.name.charAt(0)}</div>
+                                                                    <div class="min-w-0">
+                                                                        <h4 class="text-xs font-bold text-slate-800 truncate">${c.name}</h4>
+                                                                        <p class="text-[9px] text-slate-400 font-bold mt-0.5">${c.phone || 'No Phone Node'} • ${c.email || 'No Mail Node'}</p>
+                                                                    </div>
+                                                                </div>
+                                                                <i class="fas fa-arrow-right-long text-slate-200 group-hover:text-emerald-500 transition-all text-xs"></i>
+                                                            </div>
+                                                        `;
+                });
                 $('#customer-results').html(html);
             }
 
             $(document).on('click', '.select-customer-row', function () {
-                let customer = $(this).data('customer');
-                selectCustomer(customer);
+                selectCustomer($(this).data('customer'));
                 $('#customer-search-modal').fadeOut(100);
             });
 
             function selectCustomer(c) {
                 selectedCustomer = c;
                 $('#customer-id').val(c.id);
-                $('#customer-name').val(c.name).removeClass('border-rose-300');
+                $('#customer-name').val(c.name).removeClass('border-rose-300 bg-rose-50');
                 $('#customer-phone').val(c.phone || '');
                 $('#customer-email').val(c.email || '');
                 $('#customer-address').val(c.address || '');
@@ -596,14 +602,14 @@
             function addToCart(product) {
                 let existing = cart.find(i => i.id === product.id);
                 if (existing) {
-                    if (existing.quantity + 1 > product.stock_quantity) {
-                        Swal.fire({ icon: 'warning', text: `Node capacity exceeded. Max units available: [${product.stock_quantity}]`, background: '#f8fafc', color: '#0f172a', confirmButtonColor: '#4f46e5' });
+                    if (existing.quantity + 1 > product.stock) {
+                        Swal.fire({ icon: 'warning', text: 'Stock capacity exceeded.', background: '#f8fafc', confirmButtonColor: '#4f46e5' });
                         return;
                     }
                     existing.quantity += 1;
                 } else {
                     if (product.stock_quantity < 1) {
-                        Swal.fire({ icon: 'error', text: 'Node depleted. Resource currently unavailable.', background: '#f8fafc', color: '#0f172a', confirmButtonColor: '#4f46e5' });
+                        Swal.fire({ icon: 'error', text: 'Product out of stock.', background: '#f8fafc', confirmButtonColor: '#4f46e5' });
                         return;
                     }
                     cart.push({ id: product.id, name: product.name, barcode: product.barcode, price: parseFloat(product.selling_price), stock: product.stock_quantity, quantity: 1 });
@@ -619,43 +625,43 @@
                     updateTotals(0); $('#finalize-btn').attr('disabled', true); return;
                 }
                 let subtotal = 0;
-                cart.forEach(function (item, index) {
+                cart.forEach((item, index) => {
                     let lineTotal = item.price * item.quantity; subtotal += lineTotal;
                     $tbody.append(`
-                                                                                                    <tr class="hover:bg-slate-50/50 transition-all">
-                                                                                                        <td class="px-6 py-4">
-                                                                                                            <div class="flex items-center gap-4">
-                                                                                                                <div class="h-10 w-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-400 shrink-0 border border-slate-100"><i class="fas fa-cube text-xs"></i></div>
-                                                                                                                <div class="min-w-0"><p class="text-xs font-bold text-slate-800 leading-none truncate">${item.name}</p><p class="text-[9px] font-bold text-slate-400 mt-1.5 uppercase tracking-widest">${item.barcode}</p></div>
-                                                                                                            </div>
-                                                                                                        </td>
-                                                                                                        <td class="px-4 py-4 text-xs font-bold text-slate-600">${CURRENCY}${item.price.toFixed(2)}</td>
-                                                                                                        <td class="px-4 py-4 text-center">
-                                                                                                            <div class="flex items-center justify-center gap-2 bg-white border border-slate-200 rounded-xl p-1 w-fit mx-auto shadow-sm">
-                                                                                                                <button class="h-7 w-7 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-400 hover:text-indigo-600 transition-all decrease-qty" data-index="${index}"><i class="fas fa-minus text-[8px]"></i></button>
-                                                                                                                <span class="w-6 text-center text-xs font-bold text-slate-800">${item.quantity}</span>
-                                                                                                                <button class="h-7 w-7 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-400 hover:text-indigo-600 transition-all increase-qty" data-index="${index}"><i class="fas fa-plus text-[8px]"></i></button>
-                                                                                                            </div>
-                                                                                                        </td>
-                                                                                                        <td class="px-4 py-4 text-xs font-black text-indigo-600">${CURRENCY}${lineTotal.toFixed(2)}</td>
-                                                                                                        <td class="px-6 py-4 text-right"><button class="h-9 w-9 flex items-center justify-center rounded-lg text-slate-300 hover:text-rose-500 hover:bg-rose-50 transition-all remove-item" data-index="${index}"><i class="fas fa-trash-can text-xs"></i></button></td>
-                                                                                                    </tr>
-                                                                                                `);
+                                                            <tr class="hover:bg-slate-50/50 transition-all">
+                                                                <td class="px-6 py-4">
+                                                                    <div class="flex items-center gap-4">
+                                                                        <div class="h-10 w-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-400 shrink-0 border border-slate-100"><i class="fas fa-cube text-xs"></i></div>
+                                                                        <div class="min-w-0"><p class="text-xs font-bold text-slate-800 leading-none truncate">${item.name}</p><p class="text-[9px] font-bold text-slate-400 mt-1.5 uppercase tracking-widest">${item.barcode}</p></div>
+                                                                    </div>
+                                                                </td>
+                                                                <td class="px-4 py-4 text-xs font-bold text-slate-600">${CURRENCY}${item.price.toFixed(2)}</td>
+                                                                <td class="px-4 py-4 text-center">
+                                                                    <div class="flex items-center justify-center gap-2 bg-white border border-slate-200 rounded-xl p-1 w-fit mx-auto shadow-sm">
+                                                                        <button class="h-7 w-7 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-400 hover:text-indigo-600 transition-all decrease-qty" data-index="${index}"><i class="fas fa-minus text-[8px]"></i></button>
+                                                                        <span class="w-6 text-center text-xs font-bold text-slate-800">${item.quantity}</span>
+                                                                        <button class="h-7 w-7 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-400 hover:text-indigo-600 transition-all increase-qty" data-index="${index}"><i class="fas fa-plus text-[8px]"></i></button>
+                                                                    </div>
+                                                                </td>
+                                                                <td class="px-4 py-4 text-xs font-black text-indigo-600">${CURRENCY}${lineTotal.toFixed(2)}</td>
+                                                                <td class="px-6 py-4 text-right"><button class="h-9 w-9 flex items-center justify-center rounded-lg text-slate-300 hover:text-rose-500 hover:bg-rose-50 transition-all remove-item" data-index="${index}"><i class="fas fa-trash-can text-xs"></i></button></td>
+                                                            </tr>
+                                                        `);
                 });
                 updateTotals(subtotal); $('#finalize-btn').attr('disabled', false);
             }
 
             function updateTotals(subtotal) {
                 let tax = subtotal * TAX_RATE; let grand = subtotal + tax;
-                $('#summary-subtotal').text(CURRENCY + subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 }));
-                $('#summary-tax').text(CURRENCY + tax.toLocaleString(undefined, { minimumFractionDigits: 2 }));
-                $('#summary-total').text(CURRENCY + grand.toLocaleString(undefined, { minimumFractionDigits: 2 }));
+                $('#summary-subtotal').text(CURRENCY + subtotal.toFixed(2));
+                $('#summary-tax').text(CURRENCY + tax.toFixed(2));
+                $('#summary-total').text(CURRENCY + grand.toFixed(2));
             }
 
             $(document).on('click', '.increase-qty', function () {
                 let i = $(this).data('index');
                 if (cart[i].quantity + 1 > cart[i].stock) {
-                    Swal.fire({ icon: 'warning', text: 'Node resource limit reached.', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
+                    Swal.fire({ icon: 'warning', text: 'Stock limit reached.', toast: true, position: 'top-end', timer: 2000, showConfirmButton: false });
                     return;
                 }
                 cart[i].quantity += 1; renderCart();
@@ -667,55 +673,37 @@
 
             $(document).on('click', '.remove-item', function () {
                 let idx = $(this).data('index');
-                Swal.fire({ title: 'Purge Node?', text: "Detach this resource from active stream?", icon: 'question', showCancelButton: true, confirmButtonColor: '#4f46e5', cancelButtonColor: '#f43f5e', confirmButtonText: 'Yes, Detach', background: '#f8fafc' }).then((r) => { if (r.isConfirmed) { cart.splice(idx, 1); renderCart(); } });
+                Swal.fire({ title: 'Remove Item?', text: "Detach this resource?", icon: 'question', showCancelButton: true, confirmButtonColor: '#4f46e5', cancelButtonColor: '#f43f5e', confirmButtonText: 'Yes', background: '#f8fafc' }).then((r) => { if (r.isConfirmed) { cart.splice(idx, 1); renderCart(); } });
             });
 
             $('#clear-cart-btn').on('click', function () {
-                Swal.fire({ title: 'Wipe Session?', text: "Reset all terminal nodes to standby?", icon: 'warning', showCancelButton: true, confirmButtonColor: '#f43f5e', confirmButtonText: 'Purge All', background: '#f8fafc' }).then((r) => { if (r.isConfirmed) { cart = []; renderCart(); } });
+                Swal.fire({ title: 'Wipe Session?', text: "Reset all nodes?", icon: 'warning', showCancelButton: true, confirmButtonColor: '#f43f5e', confirmButtonText: 'Purge', background: '#f8fafc' }).then((r) => { if (r.isConfirmed) { cart = []; renderCart(); } });
             });
 
             /* ──────────────── SETTLEMENT ──────────────── */
-            function openFinalizeModal() {
-                // Validation before opening modal
-                let c_id = $('#customer-id').val();
-                let c_name = $('#customer-name').val();
-
-                if (!c_id && !c_name) {
+            $('#finalize-btn').on('click', function () {
+                if (!$('#customer-id').val() && !$('#customer-name').val()) {
                     $('#customer-name').addClass('border-rose-400 bg-rose-50').focus();
                     $('#customer-name-error').removeClass('hidden');
                     return;
-                } else {
-                    $('#customer-name').removeClass('border-rose-400 bg-rose-50');
-                    $('#customer-name-error').addClass('hidden');
                 }
-
                 let subtotal = 0; cart.forEach(i => subtotal += i.price * i.quantity);
                 let tax = subtotal * TAX_RATE; let grand = subtotal + tax;
-
-                $('#modal-items-list').html(cart.map(i => `
-                                                                                                <div class="flex justify-between items-center bg-white/5 p-3 rounded-xl border border-white/5">
-                                                                                                    <div class="min-w-0"><span class="text-[11px] font-bold text-white leading-none block truncate">${i.name}</span><span class="text-[9px] font-bold text-indigo-200 uppercase mt-1 opacity-60">Vol: ${i.quantity}</span></div>
-                                                                                                    <span class="font-bold text-sm text-white">${CURRENCY}${(i.price * i.quantity).toFixed(2)}</span>
-                                                                                                </div>
-                                                                                            `).join(''));
-
+                $('#modal-items-list').html(cart.map(i => `<div class="flex justify-between items-center bg-white/5 p-3 rounded-xl border border-white/5"><div class="min-w-0"><span class="text-[11px] font-bold text-white leading-none block truncate">${i.name}</span><span class="text-[9px] font-bold text-indigo-200 uppercase mt-1 opacity-60">Vol: ${i.quantity}</span></div><span class="font-bold text-sm text-white">${CURRENCY}${(i.price * i.quantity).toFixed(2)}</span></div>`).join(''));
                 $('#modal-subtotal-display').text(CURRENCY + subtotal.toFixed(2));
                 $('#modal-tax-display').text(CURRENCY + tax.toFixed(2));
                 $('#modal-total-display').text(CURRENCY + grand.toFixed(2));
                 $('#paid_amount_input').val(grand.toFixed(2)).trigger('input');
-                $('#finalizeModal').fadeIn(200);
-                setTimeout(() => $('#paid_amount_input').focus().select(), 100);
-            }
+                $('#finalizeModal').fadeIn(200).find('input#paid_amount_input').focus().select();
+            });
 
-            $('#finalize-btn').on('click', openFinalizeModal);
             $('#close-finalize-btn').on('click', () => $('#finalizeModal').fadeOut(150));
 
             $('#paid_amount_input').on('input', function () {
                 let total = parseFloat($('#modal-total-display').text().replace(CURRENCY, '').replace(/,/g, '')) || 0;
                 let paid = parseFloat($(this).val()) || 0; let diff = paid - total;
-                let $display = $('#due-amount-display'); let $header = $('#due-amount-header');
-                if (diff >= 0) { $display.text(CURRENCY + diff.toFixed(2)).removeClass('text-rose-400').addClass('text-emerald-400'); $header.text('Refund Change').removeClass('text-rose-400'); }
-                else { $display.text(CURRENCY + Math.abs(diff).toFixed(2)).removeClass('text-emerald-400').addClass('text-rose-400'); $header.text('Owed Ledger').addClass('text-rose-400'); }
+                if (diff >= 0) { $('#due-amount-display').text(CURRENCY + diff.toFixed(2)).removeClass('text-rose-400').addClass('text-emerald-400'); $('#due-amount-header').text('Refund Change').removeClass('text-rose-400'); }
+                else { $('#due-amount-display').text(CURRENCY + Math.abs(diff).toFixed(2)).removeClass('text-emerald-400').addClass('text-rose-400'); $('#due-amount-header').text('Owed Ledger').addClass('text-rose-400'); }
             });
 
             $('#confirm-sale-btn').on('click', function () {
@@ -723,17 +711,14 @@
                 let subtotal = 0; cart.forEach(i => subtotal += i.price * i.quantity);
                 let tax = subtotal * TAX_RATE; let grand = subtotal + tax;
                 let paid = parseFloat($('#paid_amount_input').val()) || 0;
-                let due = Math.max(0, grand - paid);
-                let customerData = { id: $('#customer-id').val(), name: $('#customer-name').val(), phone: $('#customer-phone').val(), email: $('#customer-email').val(), address: $('#customer-address').val() };
-
-                let payload = { customer_data: customerData, total_amount: subtotal, tax_amount: tax, grand_total: grand, paid_amount: paid, due_amount: due, payment_method: $('input[name="payment_method"]:checked').val(), items: cart.map(i => ({ product_id: i.id, quantity: i.quantity, unit_price: i.price, subtotal: i.price * i.quantity })) };
+                let payload = { customer_data: { id: $('#customer-id').val(), name: $('#customer-name').val(), phone: $('#customer-phone').val(), email: $('#customer-email').val(), address: $('#customer-address').val() }, total_amount: subtotal, tax_amount: tax, grand_total: grand, paid_amount: paid, due_amount: Math.max(0, grand - paid), payment_method: $('input[name="payment_method"]:checked').val(), items: cart.map(i => ({ product_id: i.id, quantity: i.quantity, unit_price: i.price, subtotal: i.price * i.quantity })) };
 
                 $btn.prop('disabled', true).html('<i class="fas fa-circle-notch fa-spin mr-3"></i> Syncing Node...');
                 $.ajax({
                     url: '{{ route('pos.store') }}', method: 'POST', contentType: 'application/json', data: JSON.stringify(payload),
                     success: function (res) {
                         if (res.success) {
-                            Swal.fire({ icon: 'success', title: 'Sale Executed', text: 'Committal successful. Routing to invoice matrix...', showConfirmButton: false, timer: 1200, background: '#f8fafc' });
+                            Swal.fire({ icon: 'success', title: 'Sale Executed', text: 'Committal successful.', showConfirmButton: false, timer: 1200, background: '#f8fafc' });
                             setTimeout(() => window.location.href = '{{ url('/invoice') }}/' + res.sale_id, 1200);
                         } else {
                             Swal.fire({ icon: 'error', title: 'Sync Error', text: res.message, background: '#f8fafc' }); $btn.prop('disabled', false).text('Execute Committal');
@@ -745,6 +730,8 @@
                     }
                 });
             });
+
+            $(document).on('keydown', e => { if (e.altKey && e.which === 80) { e.preventDefault(); $('#product-search').focus(); } });
         });
     </script>
 @endpush

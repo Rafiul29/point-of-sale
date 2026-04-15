@@ -51,15 +51,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/pos/search/customer', [POSController::class, 'searchCustomer'])->name('pos.customer.search');
         Route::post('/pos/store', [POSController::class, 'store'])->name('pos.store');
 
-        // Customer Access
-        Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
-        Route::get('/customers/{customer}', [CustomerController::class, 'show'])->name('customers.show');
-    });
-
-    // ── Admin-only Routes (Management Layer) ─────────────────────────────────────────
-    Route::middleware('role:Admin')->group(function () {
-        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
         // Products & Actions
         Route::get('/products/export', [\App\Http\Controllers\ProductActionController::class, 'exportProducts'])->name('products.export');
         Route::get('/stock/export', [\App\Http\Controllers\ProductActionController::class, 'exportStock'])->name('stock.export');
@@ -69,6 +60,26 @@ Route::middleware('auth')->group(function () {
 
         Route::resource('products', ProductController::class);
 
+
+        // Customer Access
+        Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
+        Route::get('/customers/{customer}', [CustomerController::class, 'show'])->name('customers.show');
+
+
+        // Reports
+        Route::get('/reports/sales', [ReportController::class, 'salesSummary'])->name('reports.sales');
+        Route::get('/reports/sales/export', [ReportController::class, 'exportSales'])->name('reports.sales.export');
+        Route::get('/reports/inventory', [ReportController::class, 'inventoryReport'])->name('reports.inventory');
+
+        Route::get('/reports/top-products', [ReportController::class, 'topProducts'])->name('reports.top-products');
+
+    });
+
+    // ── Admin-only Routes (Management Layer) ─────────────────────────────────────────
+    Route::middleware('role:Admin')->group(function () {
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+
         // Inventory
         Route::resource('categories', CategoryController::class);
         Route::resource('suppliers', SupplierController::class);
@@ -77,12 +88,6 @@ Route::middleware('auth')->group(function () {
         // Customers full CRUD (Admin only for create/edit/delete)
         Route::resource('customers', CustomerController::class)->except(['index', 'show']);
 
-        // Reports
-        Route::get('/reports/sales', [ReportController::class, 'salesSummary'])->name('reports.sales');
-        Route::get('/reports/sales/export', [ReportController::class, 'exportSales'])->name('reports.sales.export');
-        Route::get('/reports/inventory', [ReportController::class, 'inventoryReport'])->name('reports.inventory');
-
-        Route::get('/reports/top-products', [ReportController::class, 'topProducts'])->name('reports.top-products');
 
 
         // Audit Log

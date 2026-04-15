@@ -18,8 +18,8 @@ class InvoiceController extends Controller
     {
         $sale = Sale::with(['customer', 'items.product', 'user'])->findOrFail($id);
         $pdf = Pdf::loadView('reports.invoice', compact('sale'))
-                  ->setPaper('a4', 'portrait');
-                  
-        return $pdf->stream('invoice_'.str_pad($sale->id, 6, '0', STR_PAD_LEFT).'.pdf');
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->stream('invoice_' . str_pad($sale->id, 6, '0', STR_PAD_LEFT) . '.pdf');
     }
 }
