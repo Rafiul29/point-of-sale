@@ -22,9 +22,9 @@ return new class extends Migration {
         // Insert default settings directly
         DB::table('settings')->insert([
             // --- Basic Shop Info ---
-            ['key' => 'shop_name', 'value' => 'POS', 'created_at' => now(), 'updated_at' => now()],
-            ['key' => 'shop_address', 'value' => 'Silicon Valley, CA', 'created_at' => now(), 'updated_at' => now()],
-            ['key' => 'shop_phone', 'value' => '+1 555 123 4567', 'created_at' => now(), 'updated_at' => now()],
+            ['key' => 'shop_name', 'value' => 'POS ', 'created_at' => now(), 'updated_at' => now()],
+            ['key' => 'shop_address', 'value' => 'Dhaka, Bangladesh', 'created_at' => now(), 'updated_at' => now()],
+            ['key' => 'shop_phone', 'value' => '+880 1234 567890', 'created_at' => now(), 'updated_at' => now()],
             ['key' => 'currency_symbol', 'value' => '৳', 'created_at' => now(), 'updated_at' => now()],
             ['key' => 'tax_percentage', 'value' => '15', 'created_at' => now(), 'updated_at' => now()],
 

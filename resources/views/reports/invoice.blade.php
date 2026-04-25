@@ -283,8 +283,8 @@
                             <div class="prod-meta">Ref Node: {{ $item->product->barcode }}</div>
                         </td>
                         <td class="text-center" style="font-weight: 800;">{{ $item->quantity }}</td>
-                        <td class="text-right">&#2547; {{ number_format($item->unit_price, 2) }}</td>
-                        <td class="text-right" style="font-weight: 800;">&#2547; {{ number_format($item->subtotal, 2) }}</td>
+                        <td class="text-right">BDT  {{ number_format($item->unit_price, 2) }}</td>
+                        <td class="text-right" style="font-weight: 800;">BDT  {{ number_format($item->subtotal, 2) }}</td>
                     </tr>
                 @endforeach
             </tbody>
@@ -293,24 +293,24 @@
         <div class="summary-wrapper">
             <div class="summary-row">
                 NET REVENUE
-                <span class="amount-col">&#2547; {{ number_format($sale->total_amount, 2) }}</span>
+                <span class="amount-col">BDT  {{ number_format($sale->total_amount, 2) }}</span>
                 <div class="clearfix"></div>
             </div>
             <div class="summary-row">
                 TAX COMPONENT ({{ $settings['tax_rate'] ?? 15 }}%)
-                <span class="amount-col">&#2547; {{ number_format($sale->tax_amount, 2) }}</span>
+                <span class="amount-col">BDT  {{ number_format($sale->tax_amount, 2) }}</span>
                 <div class="clearfix"></div>
             </div>
             
             <div class="grand-total">
                 <span class="total-label">AGGREGATE SUM</span>
-                <span class="total-val">&#2547; {{ number_format($sale->grand_total, 2) }}</span>
+                <span class="total-val">BDT  {{ number_format($sale->grand_total, 2) }}</span>
                 <div class="clearfix"></div>
             </div>
 
             @if($sale->due_amount > 0)
                 <div class="due-badge">
-                    PENDING BALANCE: &#2547; {{ number_format($sale->due_amount, 2) }}
+                    PENDING BALANCE: BDT  {{ number_format($sale->due_amount, 2) }}
                 </div>
             @endif
         </div>
